@@ -10,3 +10,6 @@ __pychache__/
 
 # Node
 node_modules/
+
+# Bower
+bower_components/
