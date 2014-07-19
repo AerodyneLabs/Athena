@@ -1,0 +1,23 @@
+{
+  "name": "Athena",
+  "version": "0.0.0",
+  "description": "Online high altitude ballooning portal",
+  "main": "backend/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AerodyneLabs/Athena.git"
+  },
+  "author": "Ethan Harstad <ethanharstad@gmail.com>",
+  "contributors": {},
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AerodyneLabs/Athena/issues"
+  },
+  "homepage": "https://github.com/AerodyneLabs/Athena",
+  "devDependencies": {
+    "bower": "^1.3.8"
+  }
+}
