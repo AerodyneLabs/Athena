@@ -4,6 +4,7 @@
   "description": "Online high altitude ballooning portal",
   "main": "server/index.js",
   "scripts": {
+    "start": "node server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,5 +20,8 @@
   "homepage": "https://github.com/AerodyneLabs/Athena",
   "devDependencies": {
     "bower": "^1.3.8"
+  },
+  "dependencies": {
+    "restify": "^2.8.1"
   }
 }
