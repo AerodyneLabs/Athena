@@ -7,3 +7,6 @@ data/
 # Python
 __pychache__/
 *.py[cod]
+
+# Node
+node_modules/
