@@ -1,4 +1,5 @@
 var restify = require('restify');
+var socketio = require('socket.io');
 
 function version(req, res, next) {
 	res.send({
@@ -8,6 +9,7 @@ function version(req, res, next) {
 }
 
 var server = restify.createServer();
+var io = socketio.listen(server);
 
 server.get('api/version', version);
 
