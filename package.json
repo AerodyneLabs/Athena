@@ -2,7 +2,7 @@
   "name": "Athena",
   "version": "0.0.0",
   "description": "Online high altitude ballooning portal",
-  "main": "backend/index.js",
+  "main": "server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
