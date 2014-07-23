@@ -1,2 +1,16 @@
+amqp==1.4.5
+anyjson==0.3.3
 argparse==1.2.1
+backports.ssl-match-hostname==3.4.0.2
+billiard==3.3.0.18
+celery==3.1.13
+certifi==14.05.14
+flower==0.7.1
+kombu==3.0.21
+pytz==2014.4
+stevedore==0.15
+tornado==4.0
+virtualenv==1.11.6
+virtualenv-clone==0.2.5
+virtualenvwrapper==4.3.1
 wsgiref==0.1.2
