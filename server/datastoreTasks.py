@@ -1,10 +1,17 @@
 from datetime import datetime, timedelta
 from requests import get
-import Nio
+import pygrib
 from numpy import asscalar
 from backend.celery import app
 from backend.mongoTask import MongoTask
 
+def process_sounding(filename):
+    # Open sounding file
+    file = pygrib.open(filename)
+
+    # Extract sounding information
+    validTime = file[1].validTime
+    analTime = file[1].analTime
 
 @app.task(base=MongoTask)
 def download_sounding(modelRun, forecastHours):
@@ -43,9 +50,8 @@ def download_sounding(modelRun, forecastHours):
 
     # Extract data from sounding
     print 'Opening file: ' + savename
-    file = Nio.open_file('data/temp/' + savename)
-    lat = file.variables['lat_0'][:]
-    lon = file.variables['lon_0'][:]
+    file = pygrib.open('data/temp/' + savename)
+    lat, lon = file[1].latlons()
 
     # Save sounding in database
     store = download_sounding.mongo.soundings.forecast
