@@ -6,19 +6,19 @@ from backend.celery import app
 from backend.mongoTask import MongoTask
 
 
-def get_url(model, forecast):
-    serverPrefix = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/'
-    modelFolder = 'gfs.{year:04d}{month:02d}{day:02d}{run:02d}/'.format(
-        year=model.year,
-        month=model.month,
-        day=model.day,
-        run=model.hour
+def get_url(model_run, forecast_hours):
+    server_address = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/'
+    model_folder = 'gfs.{year:04d}{month:02d}{day:02d}{run:02d}/'.format(
+        year=model_run.year,
+        month=model_run.month,
+        day=model_run.day,
+        run=model_run.hour
     )
-    forecastFile = 'gfs.t{run:02d}z.pgrbf{hour:02d}.grib2'.format(
-        run=model.hour,
-        forecast=forecast
+    forecast_file = 'gfs.t{run:02d}z.pgrbf{hour:02d}.grib2'.format(
+        run=model_run.hour,
+        forecast=forecast_hours
     )
-    return serverPrefix + modelFolder + forecastFile
+    return server_address + model_folder + forecast_file
 
 
 @app.task(base=MongoTask)
