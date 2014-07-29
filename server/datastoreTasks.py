@@ -38,29 +38,14 @@ def download_forecast(model_run, forecast_hours):
 @app.task(base=MongoTask)
 def download_sounding(modelRun, forecastHours):
     # Get datetime object from modelRun timestamp
-    modelTime = datetime.utcfromtimestamp(modelRun)
-
-    soundingTime = modelTime + timedelta(hours=forecastHours)
-
-    # Create a human readable filename for the sounding
-    savename = '{year:04d}-{month:02d}-{day:02d}-{hour:02d}.grib2'.format(
-        year=soundingTime.year,
-        month=soundingTime.month,
-        day=soundingTime.day,
-        hour=soundingTime.hour
-    )
+    model_time = datetime.utcfromtimestamp(modelRun)
 
     # Download the sounding
-    print 'Saving file: ' + savename
-    r = get(fileprefix + filedir + filename, stream=True)
-    if r.status_code == 200:
-        with open('data/temp/' + savename, 'wb') as f:
-            for chunk in r.iter_content(1024):
-                f.write(chunk)
+    savename = download_forecast(model_time, forecastHours)
 
     # Extract data from sounding
     print 'Opening file: ' + savename
-    file = pygrib.open('data/temp/' + savename)
+    file = pygrib.open(savename)
     lat, lon = file[1].latlons()
 
     # Save sounding in database
