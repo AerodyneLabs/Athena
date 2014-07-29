@@ -6,6 +6,9 @@ from backend.celery import app
 from backend.mongoTask import MongoTask
 
 
+TEMP_PREFIX = 'data/temp'
+
+
 def get_url(model_run, forecast_hours):
     server_address = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/'
     model_folder = 'gfs.{year:04d}{month:02d}{day:02d}{run:02d}/'.format(
@@ -21,23 +24,22 @@ def get_url(model_run, forecast_hours):
     return server_address + model_folder + forecast_file
 
 
+def download_forecast(model_run, forecast_hours):
+    file_url = get_url(model_run, forecast_hours)
+    file_name = file_url.split('/')[-1]
+    request = get(file_url, stream=True)
+    if request.status_code == 200:
+        with open(TEMP_PREFIX + file_name, 'wb') as file:
+            for chunk in request.iter_content(1024):
+                file.write(chunk)
+    return TEMP_PREFIX + file_name
+
+
 @app.task(base=MongoTask)
 def download_sounding(modelRun, forecastHours):
     # Get datetime object from modelRun timestamp
     modelTime = datetime.utcfromtimestamp(modelRun)
 
-    # Generate the url for the requested sounding
-    fileprefix = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/'
-    filedir = 'gfs.{year:04d}{month:02d}{day:02d}{run:02d}/'.format(
-        year=modelTime.year,
-        month=modelTime.month,
-        day=modelTime.day,
-        run=modelTime.hour
-    )
-    filename = 'gfs.t{run:02d}z.pgrbf{hour:02d}.grib2'.format(
-        run=modelTime.hour,
-        hour=forecastHours
-    )
     soundingTime = modelTime + timedelta(hours=forecastHours)
 
     # Create a human readable filename for the sounding
