@@ -5,13 +5,21 @@ from numpy import asscalar
 from backend.celery import app
 from backend.mongoTask import MongoTask
 
-def process_sounding(filename):
-    # Open sounding file
-    file = pygrib.open(filename)
 
-    # Extract sounding information
-    validTime = file[1].validTime
-    analTime = file[1].analTime
+def get_url(model, forecast):
+    serverPrefix = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/'
+    modelFolder = 'gfs.{year:04d}{month:02d}{day:02d}{run:02d}/'.format(
+        year=model.year,
+        month=model.month,
+        day=model.day,
+        run=model.hour
+    )
+    forecastFile = 'gfs.t{run:02d}z.pgrbf{hour:02d}.grib2'.format(
+        run=model.hour,
+        forecast=forecast
+    )
+    return serverPrefix + modelFolder + forecastFile
+
 
 @app.task(base=MongoTask)
 def download_sounding(modelRun, forecastHours):
