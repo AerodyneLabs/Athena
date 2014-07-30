@@ -1,12 +1,9 @@
-from datetime import datetime, timedelta
 from requests import get
-import pygrib
-from numpy import asscalar
-from backend.celery import app
-from backend.mongoTask import MongoTask
+from datetime import datetime
+from worker import app
 
 
-TEMP_PREFIX = 'data/temp'
+TEMP_PREFIX = 'data/temp/'
 
 
 def get_url(model_run, forecast_hours):
@@ -17,7 +14,7 @@ def get_url(model_run, forecast_hours):
         day=model_run.day,
         run=model_run.hour
     )
-    forecast_file = 'gfs.t{run:02d}z.pgrbf{hour:02d}.grib2'.format(
+    forecast_file = 'gfs.t{run:02d}z.pgrbf{forecast:02d}.grib2'.format(
         run=model_run.hour,
         forecast=forecast_hours
     )
@@ -35,35 +32,12 @@ def download_forecast(model_run, forecast_hours):
     return TEMP_PREFIX + file_name
 
 
-@app.task(base=MongoTask)
+@app.task()
 def download_sounding(modelRun, forecastHours):
     # Get datetime object from modelRun timestamp
     model_time = datetime.utcfromtimestamp(modelRun)
 
     # Download the sounding
     savename = download_forecast(model_time, forecastHours)
-
-    # Extract data from sounding
-    print 'Opening file: ' + savename
-    file = pygrib.open(savename)
-    lat, lon = file[1].latlons()
-
-    # Save sounding in database
-    store = download_sounding.mongo.soundings.forecast
-    for y in range(len(lat)):
-        print '{0} - {1}'.format(savename, asscalar(lat[y]))
-        for x in range(len(lon)):
-            coords = [asscalar(lon[x]), asscalar(lat[y])]
-            query = {
-                'time': soundingTime,
-                'loc': {
-                    'type': 'Point',
-                    'coordinates': coords
-                }
-            }
-            sounding = {'$set': {
-                'model': modelTime
-            }}
-            store.update(query, sounding, upsert=True)
 
     return str(savename)
