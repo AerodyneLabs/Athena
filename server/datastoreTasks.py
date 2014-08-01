@@ -52,12 +52,26 @@ def process_file(file_name, db):
     # Iterate over data
     for i, lat in enumerate(lats):
         for j, lon in enumerate(lons):
+            query = {
+                'forecast': valid_time,
+                'loc': {
+                    'type': 'Point',
+                    'coordinates': [lon, lat]
+                }
+            }
+            body = {
+                'analysis': analysis_time,
+                'data': []
+            }
             for level in range(len(u_sel)):
                 p = u_sel[level].level * 100
-                u = u_sel[level].values[i,j]
-                v = v_sel[level].values[i,j]
-                t = t_sel[level].values[i,j]
-                h = h_sel[level].values[i,j]
+                u = u_sel[level].values[i, j]
+                v = v_sel[level].values[i, j]
+                t = t_sel[level].values[i, j]
+                h = h_sel[level].values[i, j]
+                body['data'].append({'h': h, 'p': p, 't': t, 'u': u, 'v': v})
+
+            print query.items() + body.items()
 
 
 @app.task()
