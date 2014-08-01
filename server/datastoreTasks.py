@@ -1,6 +1,7 @@
 from requests import get
 from datetime import datetime
 from worker import app
+from pygrib import open as grib
 
 
 TEMP_PREFIX = 'data/temp/'
@@ -30,6 +31,28 @@ def download_forecast(model_run, forecast_hours):
             for chunk in request.iter_content(1024):
                 file.write(chunk)
     return TEMP_PREFIX + file_name
+
+
+def process_file(file_name, db):
+    # Open grib file
+    file = grib(file_name)
+
+    # Extract common information
+    analysis_time = file[1].analDate
+    valid_time = file[1].validDate
+    lats = file[1].distinctLatitudes
+    lons = file[1].distinctLongitudes
+
+    # Select relevant records
+    u_sel = file.select(shortName='u', typeOfLevel='isobaricInhPa')
+    v_sel = file.select(shortName='v', typeOfLevel='isobaricInhPa')
+    t_sel = file.select(shortName='t', typeOfLevel='isobaricInhPa')
+    h_sel = file.select(shortName='gh', typeOfLevel='isobaricInhPa')
+
+    # Iterate over data
+    for i, lat in enumerate(lats):
+        for j, lon in enumerate(lons):
+            pass
 
 
 @app.task()
