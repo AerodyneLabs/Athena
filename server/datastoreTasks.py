@@ -52,7 +52,12 @@ def process_file(file_name, db):
     # Iterate over data
     for i, lat in enumerate(lats):
         for j, lon in enumerate(lons):
-            pass
+            for level in range(len(u_sel)):
+                p = u_sel[level].level * 100
+                u = u_sel[level].values[i,j]
+                v = v_sel[level].values[i,j]
+                t = t_sel[level].values[i,j]
+                h = h_sel[level].values[i,j]
 
 
 @app.task()
