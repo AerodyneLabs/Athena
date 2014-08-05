@@ -51,6 +51,7 @@ def process_file(file_name, db):
 
     # Iterate over data
     for i, lat in enumerate(lats):
+        if abs(lat) >= 80: continue
         for j, lon in enumerate(lons):
             query = {
                 'forecast': valid_time,
