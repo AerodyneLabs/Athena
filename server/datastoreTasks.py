@@ -1,68 +1,86 @@
-from datetime import datetime, timedelta
 from requests import get
-import Nio
-from numpy import asscalar
-from backend.celery import app
-from backend.mongoTask import MongoTask
+from datetime import datetime
+from worker import app
+from pygrib import open as grib
 
 
-@app.task(base=MongoTask)
-def download_sounding(modelRun, forecastHours):
-    # Get datetime object from modelRun timestamp
-    modelTime = datetime.utcfromtimestamp(modelRun)
+TEMP_PREFIX = 'data/temp/'
 
-    # Generate the url for the requested sounding
-    fileprefix = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/'
-    filedir = 'gfs.{year:04d}{month:02d}{day:02d}{run:02d}/'.format(
-        year=modelTime.year,
-        month=modelTime.month,
-        day=modelTime.day,
-        run=modelTime.hour
+
+def get_url(model_run, forecast_hours):
+    server_address = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/'
+    model_folder = 'gfs.{year:04d}{month:02d}{day:02d}{run:02d}/'.format(
+        year=model_run.year,
+        month=model_run.month,
+        day=model_run.day,
+        run=model_run.hour
     )
-    filename = 'gfs.t{run:02d}z.pgrbf{hour:02d}.grib2'.format(
-        run=modelTime.hour,
-        hour=forecastHours
+    forecast_file = 'gfs.t{run:02d}z.pgrbf{forecast:02d}.grib2'.format(
+        run=model_run.hour,
+        forecast=forecast_hours
     )
-    soundingTime = modelTime + timedelta(hours=forecastHours)
+    return server_address + model_folder + forecast_file
 
-    # Create a human readable filename for the sounding
-    savename = '{year:04d}-{month:02d}-{day:02d}-{hour:02d}.grib2'.format(
-        year=soundingTime.year,
-        month=soundingTime.month,
-        day=soundingTime.day,
-        hour=soundingTime.hour
-    )
 
-    # Download the sounding
-    print 'Saving file: ' + savename
-    r = get(fileprefix + filedir + filename, stream=True)
-    if r.status_code == 200:
-        with open('data/temp/' + savename, 'wb') as f:
-            for chunk in r.iter_content(1024):
-                f.write(chunk)
+def download_forecast(model_run, forecast_hours):
+    file_url = get_url(model_run, forecast_hours)
+    file_name = file_url.split('/')[-1]
+    request = get(file_url, stream=True)
+    if request.status_code == 200:
+        with open(TEMP_PREFIX + file_name, 'wb') as file:
+            for chunk in request.iter_content(1024):
+                file.write(chunk)
+    return TEMP_PREFIX + file_name
 
-    # Extract data from sounding
-    print 'Opening file: ' + savename
-    file = Nio.open_file('data/temp/' + savename)
-    lat = file.variables['lat_0'][:]
-    lon = file.variables['lon_0'][:]
 
-    # Save sounding in database
-    store = download_sounding.mongo.soundings.forecast
-    for y in range(len(lat)):
-        print '{0} - {1}'.format(savename, asscalar(lat[y]))
-        for x in range(len(lon)):
-            coords = [asscalar(lon[x]), asscalar(lat[y])]
+def process_file(file_name, db):
+    # Open grib file
+    file = grib(file_name)
+
+    # Extract common information
+    analysis_time = file[1].analDate
+    valid_time = file[1].validDate
+    lats = file[1].distinctLatitudes
+    lons = file[1].distinctLongitudes
+
+    # Select relevant records
+    u_sel = file.select(shortName='u', typeOfLevel='isobaricInhPa')
+    v_sel = file.select(shortName='v', typeOfLevel='isobaricInhPa')
+    t_sel = file.select(shortName='t', typeOfLevel='isobaricInhPa')
+    h_sel = file.select(shortName='gh', typeOfLevel='isobaricInhPa')
+
+    # Iterate over data
+    for i, lat in enumerate(lats):
+        if abs(lat) >= 80: continue
+        for j, lon in enumerate(lons):
             query = {
-                'time': soundingTime,
+                'forecast': valid_time,
                 'loc': {
                     'type': 'Point',
-                    'coordinates': coords
+                    'coordinates': [lon, lat]
                 }
             }
-            sounding = {'$set': {
-                'model': modelTime
-            }}
-            store.update(query, sounding, upsert=True)
+            body = {
+                'analysis': analysis_time,
+                'data': []
+            }
+            for level in range(len(u_sel)):
+                p = u_sel[level].level * 100
+                u = u_sel[level].values[i, j]
+                v = v_sel[level].values[i, j]
+                t = t_sel[level].values[i, j]
+                h = h_sel[level].values[i, j]
+                body['data'].append({'h': h, 'p': p, 't': t, 'u': u, 'v': v})
+
+            print query.items() + body.items()
+
+
+@app.task()
+def download_sounding(modelRun, forecastHours):
+    # Get datetime object from modelRun timestamp
+    model_time = datetime.utcfromtimestamp(modelRun)
+
+    # Download the sounding
+    savename = download_forecast(model_time, forecastHours)
 
     return str(savename)

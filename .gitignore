@@ -3,6 +3,7 @@ data/
 
 # vim
 *.swp
+*.swo
 
 # Python
 __pychache__/

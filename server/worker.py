@@ -6,7 +6,7 @@ app = Celery(
     broker='amqp://',
     backend='amqp',
     include=[
-        'backend.datastoreTasks'
+        'datastoreTasks'
     ]
 )
 
