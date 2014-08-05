@@ -2,6 +2,7 @@ from requests import get
 from datetime import datetime
 from worker import app
 from pygrib import open as grib
+from mongoTaks import MongoTask
 
 
 TEMP_PREFIX = 'data/temp/'
@@ -75,12 +76,15 @@ def process_file(file_name, db):
             print query.items() + body.items()
 
 
-@app.task()
+@app.task(base=MongoTask)
 def download_sounding(modelRun, forecastHours):
     # Get datetime object from modelRun timestamp
     model_time = datetime.utcfromtimestamp(modelRun)
 
     # Download the sounding
     savename = download_forecast(model_time, forecastHours)
+
+    # Process the sounding
+    process_file(savename, download_sounding.mongo)
 
     return str(savename)
