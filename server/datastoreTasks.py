@@ -2,6 +2,7 @@ from requests import get
 from datetime import datetime
 from worker import app
 from pygrib import open as grib
+from mongoTask import MongoTask
 
 
 TEMP_PREFIX = 'data/temp/'
@@ -34,25 +35,36 @@ def download_forecast(model_run, forecast_hours):
 
 
 def process_file(file_name, db):
+    # Select the database collection
+    store = db.atmosphere.forecast
+
     # Open grib file
+    print 'Opening file...'
     file = grib(file_name)
 
     # Extract common information
+    print 'Extracting common info...'
     analysis_time = file[1].analDate
     valid_time = file[1].validDate
     lats = file[1].distinctLatitudes
     lons = file[1].distinctLongitudes
 
     # Select relevant records
+    print 'Selecting records...'
     u_sel = file.select(shortName='u', typeOfLevel='isobaricInhPa')
     v_sel = file.select(shortName='v', typeOfLevel='isobaricInhPa')
     t_sel = file.select(shortName='t', typeOfLevel='isobaricInhPa')
     h_sel = file.select(shortName='gh', typeOfLevel='isobaricInhPa')
 
     # Iterate over data
+    print 'Iterating...'
     for i, lat in enumerate(lats):
-        if abs(lat) >= 80: continue
+        # Ignore extreme latitudes
+        if abs(lat) > 75:
+            continue
+
         for j, lon in enumerate(lons):
+            # Generate query document
             query = {
                 'forecast': valid_time,
                 'loc': {
@@ -60,10 +72,12 @@ def process_file(file_name, db):
                     'coordinates': [lon, lat]
                 }
             }
+            # Generate forecast body
             body = {
                 'analysis': analysis_time,
                 'data': []
             }
+            # Iterate over levels
             for level in range(len(u_sel)):
                 p = u_sel[level].level * 100
                 u = u_sel[level].values[i, j]
@@ -72,15 +86,22 @@ def process_file(file_name, db):
                 h = h_sel[level].values[i, j]
                 body['data'].append({'h': h, 'p': p, 't': t, 'u': u, 'v': v})
 
-            print query.items() + body.items()
+            # Save to db
+            print 'Processed: {0}, {1}'.format(lat, lon)
+            store.update(query, {'$set': body}, upsert=True)
 
 
-@app.task()
+@app.task(base=MongoTask)
 def download_sounding(modelRun, forecastHours):
     # Get datetime object from modelRun timestamp
     model_time = datetime.utcfromtimestamp(modelRun)
 
     # Download the sounding
+    print 'Downloading...'
     savename = download_forecast(model_time, forecastHours)
+
+    # Process the sounding
+    print 'Processing...'
+    process_file(savename, download_sounding.mongo)
 
     return str(savename)
