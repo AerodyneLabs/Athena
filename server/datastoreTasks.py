@@ -1,5 +1,5 @@
 from requests import get
-from datetime import datetime
+from datetime import datetime, timedelta
 from worker import app
 from pygrib import open as grib
 from mongoTask import MongoTask
@@ -25,7 +25,8 @@ def get_url(model_run, forecast_hours):
 
 def download_forecast(model_run, forecast_hours):
     file_url = get_url(model_run, forecast_hours)
-    file_name = file_url.split('/')[-1]
+    forecast_time = model_run + timedelta(hours=forecast_hours)
+    file_name = model_run.strftime('%Y%m%d%H') + '-' + forecast_time.strftime('%Y%m%d%H')
     request = get(file_url, stream=True)
     if request.status_code == 200:
         with open(TEMP_PREFIX + file_name, 'wb') as file:
