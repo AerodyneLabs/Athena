@@ -13,6 +13,11 @@ var io = socketio.listen(server);
 
 server.get('api/version', version);
 
+// Get sounding from database
+server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, next) {
+
+});
+
 server.listen(8080, function() {
 	console.log('%s listening at %s', server.name, server.url);
 });
