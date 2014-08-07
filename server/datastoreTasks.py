@@ -22,7 +22,7 @@ def get_url(model_run, forecast_hours):
     )
     return server_address + model_folder + forecast_file
 
-
+@app.task(base=MongoTask)
 def download_forecast(model_run, forecast_hours):
     file_url = get_url(model_run, forecast_hours)
     forecast_time = model_run + timedelta(hours=forecast_hours)
@@ -35,9 +35,10 @@ def download_forecast(model_run, forecast_hours):
     return TEMP_PREFIX + file_name
 
 
-def process_file(file_name, db):
+@app.task(base=MongoTask)
+def process_file(file_name):
     # Select the database collection
-    store = db.atmosphere.forecast
+    store = process_file.mongo.atmosphere.forecast
 
     # Open grib file
     print 'Opening file...'
@@ -93,7 +94,7 @@ def process_file(file_name, db):
 
 
 @app.task(base=MongoTask)
-def download_sounding(modelRun, forecastHours):
+def get_forecast(modelRun, forecastHours):
     # Get datetime object from modelRun timestamp
     model_time = datetime.utcfromtimestamp(modelRun)
 
