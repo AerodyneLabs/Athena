@@ -1,5 +1,5 @@
 from requests import get
-from datetime import datetime
+from datetime import datetime, timedelta
 from worker import app
 from pygrib import open as grib
 from mongoTask import MongoTask
@@ -22,10 +22,11 @@ def get_url(model_run, forecast_hours):
     )
     return server_address + model_folder + forecast_file
 
-
+@app.task(base=MongoTask)
 def download_forecast(model_run, forecast_hours):
     file_url = get_url(model_run, forecast_hours)
-    file_name = file_url.split('/')[-1]
+    forecast_time = model_run + timedelta(hours=forecast_hours)
+    file_name = model_run.strftime('%Y%m%d%H') + '-' + forecast_time.strftime('%Y%m%d%H')
     request = get(file_url, stream=True)
     if request.status_code == 200:
         with open(TEMP_PREFIX + file_name, 'wb') as file:
@@ -34,9 +35,10 @@ def download_forecast(model_run, forecast_hours):
     return TEMP_PREFIX + file_name
 
 
-def process_file(file_name, db):
+@app.task(base=MongoTask)
+def process_file(file_name):
     # Select the database collection
-    store = db.atmosphere.forecast
+    store = process_file.mongo.atmosphere.forecast
 
     # Open grib file
     print 'Opening file...'
@@ -92,7 +94,7 @@ def process_file(file_name, db):
 
 
 @app.task(base=MongoTask)
-def download_sounding(modelRun, forecastHours):
+def get_forecast(modelRun, forecastHours):
     # Get datetime object from modelRun timestamp
     model_time = datetime.utcfromtimestamp(modelRun)
 
