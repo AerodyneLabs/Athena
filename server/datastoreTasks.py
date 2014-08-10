@@ -21,23 +21,31 @@ def get_url(model_run, forecast_hours):
     return server_address + model_folder + forecast_file
 
 
-@app.task(base=MongoTask)
-def download_forecast(model_run, forecast_hours):
+@app.task(base=MongoTask, bind=True)
+def download_forecast(self, model_run, forecast_hours):
+    # Convert time string to datetime object
+    analysis_time = datetime.strptime(model_run, '%Y-%m-%dT%H:%M:%S')
     # Get URL of file on web
-    file_url = get_url(model_run, forecast_hours)
+    file_url = get_url(analysis_time, forecast_hours)
     # Compute forecast datetime
-    forecast_time = model_run + timedelta(hours=forecast_hours)
+    forecast_time = analysis_time + timedelta(hours=forecast_hours)
     # Determine human readable file name
-    file_name = model_run.strftime('%Y%m%d%H') + '-' + forecast_time.strftime('%Y%m%d%H') + '.grib2'
+    file_name = analysis_time.strftime('%Y%m%d%H') + '-' + forecast_time.strftime('%Y%m%d%H') + '.grib2'
     # Get GridFS instance
     fs = gridfs.GridFS(download_forecast.mongo.atmosphere)
     # Download the file and save to GridFS
     request = get(file_url, stream=True)
+    total_length = request.headers.get('content-length')
+    cur_length = 0
     if request.status_code == 200:
-        with fs.new_file(filename=file_name, analysis=model_run,
-                forecast=forecast_time) as file:
-            for chunk in request.iter_content(1024):
+        with fs.new_file(filename=file_name, analysis=model_run, forecast=forecast_time) as file:
+            for chunk in request.iter_content(2**18):
                 file.write(chunk)
+                cur_length += len(chunk)
+                self.update_state(
+                    state='DOWNLOADING',
+                    meta={'current': cur_length, 'total': total_length}
+                )
     # Return the file name
     return file_name
 
