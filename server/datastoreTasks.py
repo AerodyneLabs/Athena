@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from worker import app
 from pygrib import open as grib
 from mongoTask import MongoTask
+import gridfs
 
 
 TEMP_PREFIX = 'data/temp/'
@@ -28,9 +29,12 @@ def download_forecast(model_run, forecast_hours):
     file_url = get_url(model_run, forecast_hours)
     forecast_time = model_run + timedelta(hours=forecast_hours)
     file_name = model_run.strftime('%Y%m%d%H') + '-' + forecast_time.strftime('%Y%m%d%H') + '.grib2'
+    db = download_forecast.mongo.atmosphere
+    fs = gridfs.GridFS(db)
     request = get(file_url, stream=True)
     if request.status_code == 200:
-        with open(TEMP_PREFIX + file_name, 'wb') as file:
+        with fs.new_file(filename=file_name, analysis=model_run,
+                forecast=forecast_time) as file:
             for chunk in request.iter_content(1024):
                 file.write(chunk)
     return TEMP_PREFIX + file_name
