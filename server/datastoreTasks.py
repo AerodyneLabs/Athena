@@ -16,17 +16,18 @@ def get_url(model_run, forecast_hours):
         day=model_run.day,
         run=model_run.hour
     )
-    forecast_file = 'gfs.t{run:02d}z.pgrb2f{forecast:02d}.grib2'.format(
+    forecast_file = 'gfs.t{run:02d}z.pgrb2f{forecast:02d}'.format(
         run=model_run.hour,
         forecast=forecast_hours
     )
     return server_address + model_folder + forecast_file
 
+
 @app.task(base=MongoTask)
 def download_forecast(model_run, forecast_hours):
     file_url = get_url(model_run, forecast_hours)
     forecast_time = model_run + timedelta(hours=forecast_hours)
-    file_name = model_run.strftime('%Y%m%d%H') + '-' + forecast_time.strftime('%Y%m%d%H')
+    file_name = model_run.strftime('%Y%m%d%H') + '-' + forecast_time.strftime('%Y%m%d%H') + '.grib2'
     request = get(file_url, stream=True)
     if request.status_code == 200:
         with open(TEMP_PREFIX + file_name, 'wb') as file:
