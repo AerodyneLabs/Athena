@@ -69,7 +69,8 @@ def download_forecast(self, model_run, forecast_hours):
     # Compute forecast datetime
     forecast_time = analysis_time + timedelta(hours=forecast_hours)
     # Determine human readable file name
-    file_name = analysis_time.strftime('%Y%m%d%H') + '-' + forecast_time.strftime('%Y%m%d%H') + '.grib2'
+    file_name = analysis_time.strftime('%Y%m%d%H') + '-' + \
+        forecast_time.strftime('%Y%m%d%H') + '.grib2'
     # Get GridFS instance
     fs = gridfs.GridFS(download_forecast.mongo.atmosphere)
     # Download the file and save to temp file
@@ -87,5 +88,3 @@ def download_forecast(self, model_run, forecast_hours):
                 )
     # Return the file name
     return file_name
-
-
