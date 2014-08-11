@@ -4,6 +4,7 @@ from worker import app
 from pygrib import open as grib
 from mongoTask import MongoTask
 import gridfs
+import numpy as np
 
 
 def get_url(model_run, forecast_hours):
@@ -33,12 +34,12 @@ def download_forecast(self, model_run, forecast_hours):
     file_name = analysis_time.strftime('%Y%m%d%H') + '-' + forecast_time.strftime('%Y%m%d%H') + '.grib2'
     # Get GridFS instance
     fs = gridfs.GridFS(download_forecast.mongo.atmosphere)
-    # Download the file and save to GridFS
+    # Download the file and save to temp file
     request = get(file_url, stream=True)
     total_length = request.headers.get('content-length')
     cur_length = 0
     if request.status_code == 200:
-        with fs.new_file(filename=file_name, analysis=model_run, forecast=forecast_time) as file:
+        with open('data/' + file_name, 'wb') as file:
             for chunk in request.iter_content(2**18):
                 file.write(chunk)
                 cur_length += len(chunk)
