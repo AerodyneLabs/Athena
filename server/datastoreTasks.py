@@ -5,6 +5,7 @@ from pygrib import open as grib
 from mongoTask import MongoTask
 import gridfs
 import numpy as np
+from os import remove
 
 
 def get_url(model_run, forecast_hours):
@@ -71,8 +72,6 @@ def download_forecast(self, model_run, forecast_hours):
     # Determine human readable file name
     file_name = analysis_time.strftime('%Y%m%d%H') + '-' + \
         forecast_time.strftime('%Y%m%d%H') + '.grib2'
-    # Get GridFS instance
-    fs = gridfs.GridFS(download_forecast.mongo.atmosphere)
     # Download the file and save to temp file
     request = get(file_url, stream=True)
     total_length = request.headers.get('content-length')
@@ -86,5 +85,26 @@ def download_forecast(self, model_run, forecast_hours):
                     state='DOWNLOADING',
                     meta={'current': cur_length, 'total': total_length}
                 )
+
+    # Extract data into compressed file
+    npz_file_name = process_file(file_name)
+    # Get GridFS
+    fs = gridfs.GridFS(download_forecast.mongo.atmosphere)
+    # Save compressed file to GridFS
+    npz_file = open(npz_file_name, 'rb')
+    fs.put(
+        npz_file,
+        filename=npz_file_name,
+        metadata={
+            'analysis': analysis_time,
+            'forecast': forecast_time
+        }
+    )
+    npz_file.close()
+
+    # Clean up temporary files
+    remove(file_name)
+    remove(npz_file_name)
+
     # Return the file name
-    return file_name
+    return npz_file_name
