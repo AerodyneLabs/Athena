@@ -8,6 +8,9 @@ import numpy as np
 from os import remove
 
 
+TEMP_DIR = 'data/'
+
+
 def get_url(model_run, forecast_hours):
     server_address = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/'
     model_folder = 'gfs.{year:04d}{month:02d}{day:02d}{run:02d}/'.format(
@@ -77,7 +80,7 @@ def download_forecast(self, model_run, forecast_hours):
     total_length = request.headers.get('content-length')
     cur_length = 0
     if request.status_code == 200:
-        with open('data/' + file_name, 'wb') as file:
+        with open(TEMP_DIR + file_name, 'wb') as file:
             for chunk in request.iter_content(2**18):
                 file.write(chunk)
                 cur_length += len(chunk)
@@ -87,14 +90,15 @@ def download_forecast(self, model_run, forecast_hours):
                 )
 
     # Extract data into compressed file
-    npz_file_name = process_file(file_name)
+    self.update_state(state='PROCESSING')
+    npz_file_name = process_file(TEMP_DIR + file_name)
     # Get GridFS
     fs = gridfs.GridFS(download_forecast.mongo.atmosphere)
     # Save compressed file to GridFS
+    self.update_state(state='SAVING')
     npz_file = open(npz_file_name, 'rb')
     fs.put(
         npz_file,
-        filename=npz_file_name,
         metadata={
             'analysis': analysis_time,
             'forecast': forecast_time
@@ -103,7 +107,7 @@ def download_forecast(self, model_run, forecast_hours):
     npz_file.close()
 
     # Clean up temporary files
-    remove(file_name)
+    remove(TEMP_DIR + file_name)
     remove(npz_file_name)
 
     # Return the file name
