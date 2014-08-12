@@ -107,15 +107,29 @@ def extract_forecast(self, time_string, lat, lon):
 
     # Extract information
     try:
-        for latitude, longitude in zip(lat, lon):
-            pass
+        soundings = []
+        for i, j in zip(lat, lon):
+            soundings.append(generate_sounding(
+                analysis=grid_out.analysis.isoformat(),
+                forecast=grid_out.forecast.isoformat(),
+                lat=lats[i], lon=lons[j],
+                height=h_val[:, i, j],
+                pressure=p_val[:],
+                temperature=t_val[:, i, j],
+                u=u_val[:, i, j],
+                v=v_val[:, i, j]
+            ))
+        return soundings
     except TypeError:
         return generate_sounding(
             analysis=grid_out.analysis.isoformat(),
             forecast=grid_out.forecast.isoformat(),
             lat=lats[i], lon=lons[j],
-            height=h_val[:,i,j], pressure=p_val[:], temperature=t_val[:,i,j],
-            u=u_val[:,i,j], v=v_val[:,i,j]
+            height=h_val[:, i, j],
+            pressure=p_val[:],
+            temperature=t_val[:, i, j],
+            u=u_val[:, i, j],
+            v=v_val[:, i, j]
         )
 
 
