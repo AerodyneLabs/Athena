@@ -65,6 +65,35 @@ def process_file(input_name):
 
 
 @app.task(base=MongoTask, bind=True)
+def extract_forecast(self, time_string, lat, lon):
+    # Convert time string to datetime object
+    forecast_time = datetime.strptime(time_string, '%Y-%m-%dT%H:%M:%S')
+    # Get GridFS
+    fs = gridfs.GridFS(extract_forecast.mongo.atmosphere)
+    # Get npz from grid
+    grid_out = fs.get_last_version(forecast=forecast_time)
+    # Load npz and get values
+    npz = np.load(grid_out)
+    lats = npz['lat']
+    lons = npz['lon']
+    u_val = npz['u']
+    v_val = npz['v']
+    t_val = npz['t']
+    h_val = npz['h']
+    p_val = npz['p']
+    # Find array indicies
+    nLat = lats.shape[0]
+    i = -np.searchsorted(lats[::-1], lat) + nLat - 1
+    j = np.searchsorted(lons, lon)
+
+    # Extract information
+    try:
+        pass
+    except TypeError:
+        pass
+
+
+@app.task(base=MongoTask, bind=True)
 def download_forecast(self, model_run, forecast_hours):
     # Convert time string to datetime object
     analysis_time = datetime.strptime(model_run, '%Y-%m-%dT%H:%M:%S')
@@ -99,10 +128,8 @@ def download_forecast(self, model_run, forecast_hours):
     npz_file = open(npz_file_name, 'rb')
     fs.put(
         npz_file,
-        metadata={
-            'analysis': analysis_time,
-            'forecast': forecast_time
-        }
+        analysis=analysis_time,
+        forecast=forecast_time
     )
     npz_file.close()
 
