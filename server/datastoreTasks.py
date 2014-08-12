@@ -64,6 +64,25 @@ def process_file(input_name):
     return output_name
 
 
+def generate_sounding(
+        lat=None, lon=None,
+        height=None, pressure=None, temperature=None, u=None, v=None,
+        **kwargs):
+    sounding = {
+        'loc': {
+            'type': 'Point',
+            'coordinates': [lon, lat]
+        },
+        'data': []
+    }
+    for h, p, t, u, v in zip(height, pressure, temperature, u, v):
+        sounding['data'].append({
+            'h': h, 'p': p, 't': t, 'u': u, 'v': v
+        })
+
+    return dict(kwargs.items() + sounding.items())
+
+
 @app.task(base=MongoTask, bind=True)
 def extract_forecast(self, time_string, lat, lon):
     # Convert time string to datetime object
