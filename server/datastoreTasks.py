@@ -106,10 +106,11 @@ def extract_forecast(self, time_string, lat, lon):
     j = np.searchsorted(lons, lon)
 
     # Extract information
+    store = extract_forecast.mongo.atmosphere.forecast
     soundings = []
     try:
         for i, j in zip(lat, lon):
-            soundings.append(generate_sounding(
+            sounding = generate_sounding(
                 analysis=grid_out.analysis.isoformat(),
                 forecast=grid_out.forecast.isoformat(),
                 lat=lats[i], lon=lons[j],
@@ -118,9 +119,10 @@ def extract_forecast(self, time_string, lat, lon):
                 temperature=t_val[:, i, j],
                 u=u_val[:, i, j],
                 v=v_val[:, i, j]
-            ))
+            )
+            soundings.append(sounding)
     except TypeError:
-        soundings.append(generate_sounding(
+        sounding = generate_sounding(
             analysis=grid_out.analysis.isoformat(),
             forecast=grid_out.forecast.isoformat(),
             lat=lats[i], lon=lons[j],
@@ -129,10 +131,13 @@ def extract_forecast(self, time_string, lat, lon):
             temperature=t_val[:, i, j],
             u=u_val[:, i, j],
             v=v_val[:, i, j]
-        ))
-
-    # Return soundings
-    return soundings
+        )
+        soundings.append(sounding)
+    finally:
+        # Cache soundings
+        store.insert(soundings, manipulate=False)
+        # Return soundings
+        return soundings
 
 
 @app.task(base=MongoTask, bind=True)
