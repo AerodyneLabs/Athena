@@ -8,7 +8,7 @@ register(
     'myjson',
     serializer.celery_dumps,
     serializer.celery_loads,
-    content_type='application/x-myjson',
+    content_type='application/json',
     content_encoding='utf-8'
 )
 
