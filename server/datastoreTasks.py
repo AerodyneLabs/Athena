@@ -84,9 +84,7 @@ def generate_sounding(
 
 
 @app.task(base=MongoTask, bind=True)
-def extract_forecast(self, time_string, lat, lon):
-    # Convert time string to datetime object
-    forecast_time = datetime.strptime(time_string, '%Y-%m-%dT%H:%M:%S')
+def extract_forecast(self, forecast_time, lat, lon):
     # Get GridFS
     fs = gridfs.GridFS(extract_forecast.mongo.atmosphere)
     # Get npz from grid
@@ -141,9 +139,7 @@ def extract_forecast(self, time_string, lat, lon):
 
 
 @app.task(base=MongoTask, bind=True)
-def download_forecast(self, model_run, forecast_hours):
-    # Convert time string to datetime object
-    analysis_time = datetime.strptime(model_run, '%Y-%m-%dT%H:%M:%S')
+def download_forecast(self, analysis_time, forecast_hours):
     # Get URL of file on web
     file_url = get_url(analysis_time, forecast_hours)
     # Compute forecast datetime
