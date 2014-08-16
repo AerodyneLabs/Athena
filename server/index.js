@@ -25,11 +25,11 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 	var lat = Number(req.params.latitude);
 	var lon = Number(req.params.longitude);
 	var store = monk.get('forecast');
-	store.find({
+	store.findOne({
 		'forecast': time,
 		'loc.coordinates':[lon, lat]
 	}, function(err, docs) {
-		if(docs[0]) {
+		if(docs) {
 			res.send(docs);
 			return;
 		} else {
@@ -38,7 +38,9 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 				[time, lat, lon]
 			);
 			result.once('success', function(data) {
-				res.send(data.result);
+				store.findById(data.result[0], function(err, doc) {
+					res.send(doc);
+				});
 			});
 			result.once('failed', function(data) {
 				res.send(data);

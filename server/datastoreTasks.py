@@ -138,9 +138,9 @@ def extract_forecast(self, forecast_time, lat, lon):
         soundings.append(sounding)
     finally:
         # Cache soundings
-        store.insert(soundings, manipulate=False)
+        ids = store.insert(soundings)
         # Return soundings
-        return soundings
+        return map(lambda o: str(o), ids)
 
 
 @app.task(base=MongoTask, bind=True)
