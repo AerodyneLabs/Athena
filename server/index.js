@@ -1,6 +1,11 @@
 var restify = require('restify');
 var socketio = require('socket.io');
 var monk = require('monk')('localhost/atmosphere');
+var celery = require('node-celery').createClient({
+	CELERY_BROKER_URL: 'amqp://guest:guest@localhost:5672',
+	CELERY_RESULT_BACKEND: 'amqp',
+	CELERY_TASK_RESULT_EXPIRES: 3600
+});
 
 function version(req, res, next) {
 	res.send({
@@ -20,11 +25,27 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 	var lat = Number(req.params.latitude);
 	var lon = Number(req.params.longitude);
 	var store = monk.get('forecast');
-	store.find({
+	store.findOne({
 		'forecast': time,
 		'loc.coordinates':[lon, lat]
 	}, function(err, docs) {
-		res.send(docs);
+		if(docs) {
+			res.send(docs);
+			return;
+		} else {
+			var result = celery.call(
+				'datastoreTasks.extract_forecast',
+				[time, lat, lon]
+			);
+			result.once('success', function(data) {
+				store.findById(data.result[0], function(err, doc) {
+					res.send(doc);
+				});
+			});
+			result.once('failed', function(data) {
+				res.send(data);
+			});
+		}
 	});
 });
 
