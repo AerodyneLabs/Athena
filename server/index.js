@@ -33,7 +33,7 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 	});*/
 	var result = celery.call(
 		'datastoreTasks.extract_forecast',
-		[time.toISOString().replace(/\..+/, ''), lat, lon]
+		[time, lat, lon]
 	);
 	result.once('success', function(data) {
 		res.send(data.result);
