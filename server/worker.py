@@ -5,7 +5,7 @@ import serializer
 
 
 register(
-    'myjson',
+    'json',
     serializer.celery_dumps,
     serializer.celery_loads,
     content_type='application/json',
@@ -23,9 +23,9 @@ app = Celery(
 
 app.conf.update(
     CELERY_ENABLE_UTC=True,
-    CELERY_RESULT_SERIALIZER='myjson',
-    CELERY_ACCEPT_CONTENT=['myjson'],
-    CELERY_TASK_SERIALIZER='myjson',
+    CELERY_RESULT_SERIALIZER='json',
+    CELERY_ACCEPT_CONTENT=['json'],
+    CELERY_TASK_SERIALIZER='json',
     CELERY_TRACK_STARTED=True,
     CELERY_TASK_RESULT_EXPIRES=3600
 )
