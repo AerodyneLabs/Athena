@@ -85,6 +85,11 @@ def generate_sounding(
 
 @app.task(base=MongoTask, bind=True)
 def extract_forecast(self, forecast_time, lat, lon):
+    if not isinstance(forecast_time, datetime):
+        forecast_time = datetime.strptime(
+            forecast_time.split('.')[0],
+            '%Y-%m-%dT%H:%M:%S'
+        )
     # Get GridFS
     fs = gridfs.GridFS(extract_forecast.mongo.atmosphere)
     # Get npz from grid
@@ -109,8 +114,8 @@ def extract_forecast(self, forecast_time, lat, lon):
     try:
         for i, j in zip(lat, lon):
             sounding = generate_sounding(
-                analysis=grid_out.analysis.isoformat(),
-                forecast=grid_out.forecast.isoformat(),
+                analysis=grid_out.analysis,
+                forecast=grid_out.forecast,
                 lat=lats[i], lon=lons[j],
                 height=h_val[:, i, j],
                 pressure=p_val[:],
@@ -121,8 +126,8 @@ def extract_forecast(self, forecast_time, lat, lon):
             soundings.append(sounding)
     except TypeError:
         sounding = generate_sounding(
-            analysis=grid_out.analysis.isoformat(),
-            forecast=grid_out.forecast.isoformat(),
+            analysis=grid_out.analysis,
+            forecast=grid_out.forecast,
             lat=lats[i], lon=lons[j],
             height=h_val[:, i, j],
             pressure=p_val[:],
