@@ -181,6 +181,10 @@ def download_forecast(self, analysis_time, forecast_hours):
     )
     npz_file.close()
 
+    # Clear forecast cache
+    store = download_forecast.mongo.atmosphere.forecast
+    store.remove({'forecast': forecast_time})
+
     # Clean up temporary files
     remove(TEMP_DIR + file_name)
     remove(npz_file_name)
