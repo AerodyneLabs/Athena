@@ -24,22 +24,26 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 	var time = new Date(Number(req.params.timestamp));
 	var lat = Number(req.params.latitude);
 	var lon = Number(req.params.longitude);
-	/*var store = monk.get('forecast');
+	var store = monk.get('forecast');
 	store.find({
 		'forecast': time,
 		'loc.coordinates':[lon, lat]
 	}, function(err, docs) {
-		res.send(docs);
-	});*/
-	var result = celery.call(
-		'datastoreTasks.extract_forecast',
-		[time, lat, lon]
-	);
-	result.once('success', function(data) {
-		res.send(data.result);
-	});
-	result.once('failed', function(data) {
-		res.send(data);
+		if(docs[0]) {
+			res.send(docs);
+			return;
+		} else {
+			var result = celery.call(
+				'datastoreTasks.extract_forecast',
+				[time, lat, lon]
+			);
+			result.once('success', function(data) {
+				res.send(data.result);
+			});
+			result.once('failed', function(data) {
+				res.send(data);
+			});
+		}
 	});
 });
 
