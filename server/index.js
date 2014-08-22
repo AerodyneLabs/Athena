@@ -34,7 +34,7 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 			return;
 		} else {
 			var result = celery.call(
-				'datastoreTasks.extract_forecast',
+				'atmosphereTasks.extract_forecast',
 				[time, lat, lon]
 			);
 			result.once('success', function(data) {
