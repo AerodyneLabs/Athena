@@ -1,6 +1,7 @@
 from datetime import date
 from math import floor
 from requests import get
+from zipfile import ZipFile
 
 
 TEMP_DIR = 'data/'
@@ -36,3 +37,13 @@ def download_latest_nav():
                 cur_length += len(chunk)
     # Return filename
     return TEMP_DIR + filename
+
+
+def process_nav_file(filename):
+    # Open input zip file
+    zf = ZipFile(filename)
+    # Open the contained file
+    nav_file = zf.open('NAV.txt')
+    # Iterate over the file
+    for line in nav_file:
+        pass
