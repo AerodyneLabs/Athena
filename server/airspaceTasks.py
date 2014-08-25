@@ -15,13 +15,16 @@ def get_latest_date():
     return latest
 
 
-def download_latest():
-    # Get file url
-    latest_date = get_latest_date()
+def get_latest_url():
     prefix = 'https://nfdc.faa.gov/webContent/56DaySub/'
-    filename = 'aixm5.1.zip'
-    folder = '{0}/'.format(latest_date)
-    url = prefix + folder + filename
+    folder = '{0}/'.format(get_latest_date())
+    return prefix + folder + 'NAV.zip'
+
+
+def download_latest_nav():
+    # Get file url
+    url = get_latest_url()
+    filename = url.split('/')[-1]
     # Download file
     request = get(url, stream=True)
     total_length = request.headers.get('content-length')
