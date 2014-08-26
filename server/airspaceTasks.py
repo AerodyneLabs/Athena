@@ -120,7 +120,7 @@ def process_nav_file(self, filename):
             if type in nav_filter:
                 try:
                     navaid = {'type': type}
-                    navaid['id'] = get_field(line, nav_fields['id']),
+                    navaid['id'] = get_field(line, nav_fields['id'])
                     navaid['valid'] = datetime.strptime(
                         get_field(line, nav_fields['valid']),
                         '%m/%d/%Y')
@@ -143,7 +143,8 @@ def process_nav_file(self, filename):
                     navaid['variation'] = parse_variation(get_field(
                         line, nav_fields['variation']))
                     navaid['status'] = get_field(line, nav_fields['status'])
-                    store.insert(navaid)
+                    store.update(
+                        {'id': navaid['id']}, {'$set': navaid}, upsert=True)
                     count += 1
                     self.update_state(
                         state='PROCESSING',
