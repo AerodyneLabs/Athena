@@ -17,6 +17,7 @@ app = Celery(
     broker='amqp://',
     backend='amqp',
     include=[
+        'airspaceTasks',
         'atmosphereTasks'
     ]
 )
