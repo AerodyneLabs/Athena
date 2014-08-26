@@ -5,6 +5,8 @@ from zipfile import ZipFile
 from collections import namedtuple
 from datetime import datetime
 from os import remove
+from shapefile import Reader
+from geojson import Feature
 from worker import app
 from mongoTask import MongoTask
 
@@ -30,6 +32,9 @@ nav_fields = {
     'status': RecordField(767, 30, 'l'),
 }
 nav_filter = ['VOR/DME', 'VORTAC']
+airspace_files = [
+    'Shape_Files/class_b'
+]
 
 
 def get_field(record, field):
@@ -157,4 +162,51 @@ def process_nav_file(self, filename):
     zf.close()
     remove(filename)
     # Return record count
+    return count
+
+
+@app.task(base=MongoTask, bind=True)
+def process_airspace_file(self, filename):
+    # Open input zip file
+    zf = ZipFile(filename)
+    # Open the database
+    store = process_airspace_file.mongo.airspace.airspaces
+    # Iterate different airspace types
+    count = 0
+    for airspace in airspace_files:
+        # Extract component files
+        shp_fn = zf.extract(airspace + '.shp', TEMP_DIR)
+        shx_fn = zf.extract(airspace + '.shx', TEMP_DIR)
+        dbf_fn = zf.extract(airspace + '.dbf', TEMP_DIR)
+        # Open interface to shapefile
+        sf = Reader(shp_fn)
+        # Iterate over shapes
+        cur_airspace = ''
+        for sr in sf.shapeRecords():
+            loAlt = 0
+            if sr.record[2] != 'SFC':
+                try:
+                    loAlt = float(sr.record[2])
+                except ValueError:
+                    pass
+            hiAlt = float(sr.record[3])
+            feature = Feature(
+                geometry=sr.shape,
+                id=sr.record[1],
+                properties={
+                    'airspace': sr.record[0],
+                    'lo': loAlt,
+                    'hi': hiAlt
+                }
+            )
+            store.insert(feature)
+            count += 1
+        # Delete the temp files
+        remove(shp_fn)
+        remove(shx_fn)
+        remove(dbf_fn)
+    # Close/delete zip file
+    zf.close()
+    remove(filename)
+    # Return something useful
     return count
