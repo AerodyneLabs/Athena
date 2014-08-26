@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "mongodb": "^1.4.8",
+    "mongoskin": "^1.4.4",
     "monk": "^0.9.0",
     "node-celery": "^0.2.2",
     "restify": "^2.8.1",
