@@ -57,6 +57,13 @@ def parse_variation(x):
         return -deg
 
 
+def parse_boolean(x):
+    if x in ['y', 'Y']:
+        return True
+    else:
+        return False
+
+
 def get_latest_date():
     # Find latest date on the 56 day cycle
     ref_ord = date(2014, 5, 29).toordinal()
@@ -114,8 +121,10 @@ def process_nav_file(self, filename):
                     navaid['name'] = get_field(line, nav_fields['name'])
                     navaid['city'] = get_field(line, nav_fields['city'])
                     navaid['state'] = get_field(line, nav_fields['state'])
-                    navaid['common'] = get_field(line, nav_fields['common'])
-                    navaid['public'] = get_field(line, nav_fields['public'])
+                    navaid['common'] = parse_boolean(get_field(
+                        line, nav_fields['common']))
+                    navaid['public'] = parse_boolean(get_field(
+                        line, nav_fields['public']))
                     lat = parse_dms(get_field(line, nav_fields['latitude']))
                     lon = parse_dms(get_field(line, nav_fields['longitude']))
                     navaid['loc'] = {
