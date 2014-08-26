@@ -72,7 +72,7 @@ def get_latest_url():
     return prefix + folder + 'NAV.zip'
 
 
-@app.task(base=MongoTask, bind=True)
+@app.task(bind=True)
 def download_latest_nav(self):
     # Get file url
     url = get_latest_url()
@@ -94,7 +94,8 @@ def download_latest_nav(self):
     return TEMP_DIR + filename
 
 
-def process_nav_file(filename):
+@app.task(base=MongoTask, bind=True)
+def process_nav_file(self, filename):
     # Open input zip file
     zf = ZipFile(filename)
     # Open the contained file
@@ -120,6 +121,10 @@ def process_nav_file(filename):
                     navaid['status'] = get_field(line, nav_fields['status'])
                     print navaid
                     count += 1
+                    self.update_state(
+                        state='PROCESSING',
+                        meta={'current': count}
+                    )
                 except ValueError:
                     continue
     # Close the zip file
