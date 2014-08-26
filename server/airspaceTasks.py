@@ -47,7 +47,7 @@ def parse_dms(x):
     return (deg + (min / 60) + (sec / 3600)) * dec
 
 
-def parse_variance(x):
+def parse_variation(x):
     deg = float(x[:-1])
     if x[-1] == 'E':
         return deg
@@ -93,5 +93,29 @@ def process_nav_file(filename):
     # Open the contained file
     nav_file = zf.open('NAV.txt')
     # Iterate over the file
+    count = 0
     for line in nav_file:
-        pass
+        if get_field(line, nav_fields['record']) == 'NAV1':
+            type = get_field(line, nav_fields['type'])
+            if type in nav_filter:
+                try:
+                    navaid = {'type': type}
+                    navaid['id'] = get_field(line, nav_fields['id'])
+                    navaid['name'] = get_field(line, nav_fields['name'])
+                    navaid['city'] = get_field(line, nav_fields['city'])
+                    navaid['state'] = get_field(line, nav_fields['state'])
+                    navaid['common'] = get_field(line, nav_fields['common'])
+                    navaid['public'] = get_field(line, nav_fields['public'])
+                    navaid['latitude'] = parse_dms(get_field(line, nav_fields['latitude']))
+                    navaid['longitude'] = parse_dms(get_field(line, nav_fields['longitude']))
+                    navaid['elevation'] = float(get_field(line, nav_fields['elevation']))
+                    navaid['variation'] = parse_variation(get_field(line, nav_fields['variation']))
+                    navaid['status'] = get_field(line, nav_fields['status'])
+                    print navaid
+                    count += 1
+                except ValueError:
+                    continue
+    # Close the zip file
+    zf.close()
+    # Return record count
+    return count
