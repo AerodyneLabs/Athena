@@ -4,6 +4,7 @@ from requests import get
 from zipfile import ZipFile
 from collections import namedtuple
 from datetime import datetime
+from os import remove
 from worker import app
 from mongoTask import MongoTask
 
@@ -152,7 +153,8 @@ def process_nav_file(self, filename):
                     )
                 except ValueError:
                     continue
-    # Close the zip file
+    # Close and delete the zip file
     zf.close()
+    remove(filename)
     # Return record count
     return count
