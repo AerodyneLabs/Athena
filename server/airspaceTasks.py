@@ -77,16 +77,16 @@ def get_latest_date():
     return latest
 
 
-def get_latest_url():
+def get_latest_url(filename):
     prefix = 'https://nfdc.faa.gov/webContent/56DaySub/'
     folder = '{0}/'.format(get_latest_date())
-    return prefix + folder + 'NAV.zip'
+    return prefix + folder + filename
 
 
 @app.task(bind=True)
-def download_latest_nav(self):
+def download_latest_file(self, filename):
     # Get file url
-    url = get_latest_url()
+    url = get_latest_url(filename)
     filename = url.split('/')[-1]
     # Download file
     request = get(url, stream=True)
