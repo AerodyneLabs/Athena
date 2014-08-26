@@ -2,9 +2,38 @@ from datetime import date
 from math import floor
 from requests import get
 from zipfile import ZipFile
+from collections import namedtuple
 
 
 TEMP_DIR = 'data/'
+RecordField = namedtuple('RecordField', ['start', 'length', 'just'])
+nav_fields = {
+    'record': RecordField(1, 4, 'l'),
+    'id': RecordField(5, 4, 'l'),
+    'type': RecordField(9, 20, 'l'),
+    'name': RecordField(43, 30, 'l'),
+    'city': RecordField(73, 40, 'l'),
+    'state': RecordField(113, 30, 'l'),
+    'common': RecordField(280, 1, 'l'),
+    'public': RecordField(281, 1, 'l'),
+    'latitude': RecordField(372, 14, 'l'),
+    'longitude': RecordField(397, 14, 'l'),
+    'elevation': RecordField(473, 7, 'r'),
+    'variation': RecordField(480, 5, 'r'),
+    'epoch': RecordField(485, 4, 'r'),
+    'status': RecordField(767, 30, 'l'),
+}
+nav_filter = ['VOR/DME', 'VORTAC']
+
+
+def get_field(record, field):
+    value = record[field.start-1:field.start+field.length-1]
+    if field.just == 'l':
+        return value.rstrip()
+    elif field.just == 'r':
+        return value.strip()
+    else:
+        return value
 
 
 def get_latest_date():
