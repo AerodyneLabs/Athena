@@ -3,6 +3,7 @@ from math import floor
 from requests import get
 from zipfile import ZipFile
 from collections import namedtuple
+from datetime import datetime
 from worker import app
 from mongoTask import MongoTask
 
@@ -13,6 +14,7 @@ nav_fields = {
     'record': RecordField(1, 4, 'l'),
     'id': RecordField(5, 4, 'l'),
     'type': RecordField(9, 20, 'l'),
+    'valid': RecordField(33, 10, 'l'),
     'name': RecordField(43, 30, 'l'),
     'city': RecordField(73, 40, 'l'),
     'state': RecordField(113, 30, 'l'),
@@ -117,7 +119,10 @@ def process_nav_file(self, filename):
             if type in nav_filter:
                 try:
                     navaid = {'type': type}
-                    navaid['id'] = get_field(line, nav_fields['id'])
+                    navaid['id'] = get_field(line, nav_fields['id']),
+                    navaid['valid'] = datetime.strptime(
+                        get_field(line, nav_fields['valid']),
+                        '%m/%d/%Y')
                     navaid['name'] = get_field(line, nav_fields['name'])
                     navaid['city'] = get_field(line, nav_fields['city'])
                     navaid['state'] = get_field(line, nav_fields['state'])
