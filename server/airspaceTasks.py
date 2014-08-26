@@ -3,6 +3,8 @@ from math import floor
 from requests import get
 from zipfile import ZipFile
 from collections import namedtuple
+from worker import app
+from mongotask import MongoTask
 
 
 TEMP_DIR = 'data/'
@@ -70,7 +72,8 @@ def get_latest_url():
     return prefix + folder + 'NAV.zip'
 
 
-def download_latest_nav():
+@app.task(base=MongoTask, bind=True)
+def download_latest_nav(self):
     # Get file url
     url = get_latest_url()
     filename = url.split('/')[-1]
@@ -83,6 +86,10 @@ def download_latest_nav():
             for chunk in request.iter_content(2**18):
                 file.write(chunk)
                 cur_length += len(chunk)
+                self.update_state(
+                    state='DOWNLOADING',
+                    meta={'current': cur_length, 'total': total_length}
+                )
     # Return filename
     return TEMP_DIR + filename
 
