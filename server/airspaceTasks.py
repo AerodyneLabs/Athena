@@ -4,7 +4,7 @@ from requests import get
 from zipfile import ZipFile
 from collections import namedtuple
 from worker import app
-from mongotask import MongoTask
+from mongoTask import MongoTask
 
 
 TEMP_DIR = 'data/'
@@ -114,10 +114,14 @@ def process_nav_file(self, filename):
                     navaid['state'] = get_field(line, nav_fields['state'])
                     navaid['common'] = get_field(line, nav_fields['common'])
                     navaid['public'] = get_field(line, nav_fields['public'])
-                    navaid['latitude'] = parse_dms(get_field(line, nav_fields['latitude']))
-                    navaid['longitude'] = parse_dms(get_field(line, nav_fields['longitude']))
-                    navaid['elevation'] = float(get_field(line, nav_fields['elevation']))
-                    navaid['variation'] = parse_variation(get_field(line, nav_fields['variation']))
+                    navaid['latitude'] = parse_dms(get_field(
+                        line, nav_fields['latitude']))
+                    navaid['longitude'] = parse_dms(get_field(
+                        line, nav_fields['longitude']))
+                    navaid['elevation'] = float(get_field(
+                        line, nav_fields['elevation']))
+                    navaid['variation'] = parse_variation(get_field(
+                        line, nav_fields['variation']))
                     navaid['status'] = get_field(line, nav_fields['status'])
                     print navaid
                     count += 1
