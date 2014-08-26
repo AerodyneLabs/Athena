@@ -36,6 +36,25 @@ def get_field(record, field):
         return value
 
 
+def parse_dms(x):
+    tokens = x.split('-')
+    deg = float(tokens[0])
+    min = float(tokens[1])
+    sec = float(tokens[2][:-1])
+    dec = 1.0
+    if tokens[2][-1] in ['S', 'W']:
+        dec = -1.0
+    return (deg + (min / 60) + (sec / 3600)) * dec
+
+
+def parse_variance(x):
+    deg = float(x[:-1])
+    if x[-1] == 'E':
+        return deg
+    else:
+        return -deg
+
+
 def get_latest_date():
     # Find latest date on the 56 day cycle
     ref_ord = date(2014, 5, 29).toordinal()
