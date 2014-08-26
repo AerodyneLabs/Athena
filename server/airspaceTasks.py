@@ -100,6 +100,8 @@ def process_nav_file(self, filename):
     zf = ZipFile(filename)
     # Open the contained file
     nav_file = zf.open('NAV.txt')
+    # Open database collection
+    store = process_nav_file.mongo.airspace.navaids
     # Iterate over the file
     count = 0
     for line in nav_file:
@@ -114,16 +116,18 @@ def process_nav_file(self, filename):
                     navaid['state'] = get_field(line, nav_fields['state'])
                     navaid['common'] = get_field(line, nav_fields['common'])
                     navaid['public'] = get_field(line, nav_fields['public'])
-                    navaid['latitude'] = parse_dms(get_field(
-                        line, nav_fields['latitude']))
-                    navaid['longitude'] = parse_dms(get_field(
-                        line, nav_fields['longitude']))
+                    lat = parse_dms(get_field(line, nav_fields['latitude']))
+                    lon = parse_dms(get_field(line, nav_fields['longitude']))
+                    navaid['loc'] = {
+                        'type': 'Point',
+                        'coordinates': [lon, lat]
+                    }
                     navaid['elevation'] = float(get_field(
                         line, nav_fields['elevation']))
                     navaid['variation'] = parse_variation(get_field(
                         line, nav_fields['variation']))
                     navaid['status'] = get_field(line, nav_fields['status'])
-                    print navaid
+                    store.insert(navaid)
                     count += 1
                     self.update_state(
                         state='PROCESSING',
