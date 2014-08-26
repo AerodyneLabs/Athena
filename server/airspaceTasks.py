@@ -18,6 +18,7 @@ nav_fields = {
     'name': RecordField(43, 30, 'l'),
     'city': RecordField(73, 40, 'l'),
     'state': RecordField(113, 30, 'l'),
+    'country': RecordField(148, 30, 'l'),
     'common': RecordField(280, 1, 'l'),
     'public': RecordField(281, 1, 'l'),
     'latitude': RecordField(372, 14, 'l'),
@@ -126,6 +127,7 @@ def process_nav_file(self, filename):
                     navaid['name'] = get_field(line, nav_fields['name'])
                     navaid['city'] = get_field(line, nav_fields['city'])
                     navaid['state'] = get_field(line, nav_fields['state'])
+                    navaid['country'] = get_field(line, nav_fields['country'])
                     navaid['common'] = parse_boolean(get_field(
                         line, nav_fields['common']))
                     navaid['public'] = parse_boolean(get_field(
