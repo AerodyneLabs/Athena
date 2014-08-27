@@ -6,7 +6,7 @@ from collections import namedtuple
 from datetime import datetime
 from os import remove
 from shapefile import Reader
-from geojson import Feature
+from geojson import Feature, Point
 from worker import app
 from mongoTask import MongoTask
 
@@ -125,32 +125,31 @@ def process_nav_file(self, filename):
             type = get_field(line, nav_fields['type'])
             if type in nav_filter:
                 try:
-                    navaid = {'type': type}
-                    navaid['id'] = get_field(line, nav_fields['id'])
-                    navaid['valid'] = datetime.strptime(
+                    properties = {'type': type}
+                    id = get_field(line, nav_fields['id'])
+                    properties['valid'] = datetime.strptime(
                         get_field(line, nav_fields['valid']),
                         '%m/%d/%Y')
-                    navaid['name'] = get_field(line, nav_fields['name'])
-                    navaid['city'] = get_field(line, nav_fields['city'])
-                    navaid['state'] = get_field(line, nav_fields['state'])
-                    navaid['country'] = get_field(line, nav_fields['country'])
-                    navaid['common'] = parse_boolean(get_field(
+                    properties['name'] = get_field(line, nav_fields['name'])
+                    properties['city'] = get_field(line, nav_fields['city'])
+                    properties['state'] = get_field(line, nav_fields['state'])
+                    properties['country'] = get_field(line, nav_fields['country'])
+                    properties['common'] = parse_boolean(get_field(
                         line, nav_fields['common']))
-                    navaid['public'] = parse_boolean(get_field(
+                    properties['public'] = parse_boolean(get_field(
                         line, nav_fields['public']))
                     lat = parse_dms(get_field(line, nav_fields['latitude']))
                     lon = parse_dms(get_field(line, nav_fields['longitude']))
-                    navaid['loc'] = {
-                        'type': 'Point',
-                        'coordinates': [lon, lat]
-                    }
-                    navaid['elevation'] = float(get_field(
+                    point = Point((lon, lat))
+                    properties['elevation'] = float(get_field(
                         line, nav_fields['elevation']))
-                    navaid['variation'] = parse_variation(get_field(
+                    properties['variation'] = parse_variation(get_field(
                         line, nav_fields['variation']))
-                    navaid['status'] = get_field(line, nav_fields['status'])
+                    properties['status'] = get_field(line, nav_fields['status'])
+                    navaid = Feature(
+                        geometry=point, properties=properties, id=id)
                     store.update(
-                        {'id': navaid['id']}, {'$set': navaid}, upsert=True)
+                        {'id': id}, {'$set': navaid}, upsert=True)
                     count += 1
                     self.update_state(
                         state='PROCESSING',
