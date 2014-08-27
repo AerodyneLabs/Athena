@@ -32,9 +32,9 @@ nav_fields = {
     'status': RecordField(767, 30, 'l'),
 }
 nav_filter = ['VOR/DME', 'VORTAC']
-airspace_files = [
-    'Shape_Files/class_b'
-]
+airspace_files = {
+    'Shape_Files/class_b': 'Class B'
+}
 
 
 def get_field(record, field):
@@ -172,11 +172,11 @@ def process_airspace_file(self, filename):
     store = process_airspace_file.mongo.airspace.airspaces
     # Iterate different airspace types
     count = 0
-    for airspace in airspace_files:
+    for airspace_name, airspace_class in airspace_files.iteritems():
         # Extract component files
-        shp_fn = zf.extract(airspace + '.shp', TEMP_DIR)
-        shx_fn = zf.extract(airspace + '.shx', TEMP_DIR)
-        dbf_fn = zf.extract(airspace + '.dbf', TEMP_DIR)
+        shp_fn = zf.extract(airspace_name + '.shp', TEMP_DIR)
+        shx_fn = zf.extract(airspace_name + '.shx', TEMP_DIR)
+        dbf_fn = zf.extract(airspace_name + '.dbf', TEMP_DIR)
         # Open interface to shapefile
         sf = Reader(shp_fn)
         # Iterate over shapes
@@ -203,7 +203,8 @@ def process_airspace_file(self, filename):
                 properties={
                     'airspace': sr.record[0],
                     'lo': loAlt,
-                    'hi': hiAlt
+                    'hi': hiAlt,
+                    'class': airspace_class
                 },
                 bounds=bounds
             )
