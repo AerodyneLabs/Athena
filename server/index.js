@@ -79,6 +79,40 @@ server.get('api/navaids/:latitude/:longitude', function(req, res, next) {
 	});
 });
 
+server.get('api/airspaces/:lat1/:lon1/:lat2/:lon2', function(req, res, next) {
+	var lat1 = Number(req.params.lat1);
+	var lon1 = Number(req.params.lon1);
+	var lat2 = Number(req.params.lat2);
+	var lon2 = Number(req.params.lon2);
+	var store = airspace.get('airspaces');
+	store.find({
+		'bounds': {
+			'$geoIntersects': {
+				'$geometry': {
+					'type': 'Polygon',
+					'coordinates': [[
+						[lon1, lat1],
+						[lon2, lat1],
+						[lon2, lat2],
+						[lon1, lat2],
+						[lon1, lat1]
+					]]
+				}
+			}
+		}
+	}, function(err, docs) {
+		if(err) {
+			res.send(400, err);
+		} else {
+			var features = {
+				'type': 'FeatureCollection',
+				'features': docs
+			}
+			res.send(features);
+		}
+	});
+});
+
 server.listen(8080, function() {
 	console.log('%s listening at %s', server.name, server.url);
 });
