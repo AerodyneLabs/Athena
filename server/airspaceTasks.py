@@ -182,6 +182,7 @@ def process_airspace_file(self, filename):
         # Iterate over shapes
         cur_airspace = ''
         for sr in sf.shapeRecords():
+            id = sr.record[1]
             loAlt = 0
             if sr.record[2] != 'SFC':
                 try:
@@ -199,7 +200,7 @@ def process_airspace_file(self, filename):
             ]])
             feature = Feature(
                 geometry=sr.shape,
-                id=sr.record[1],
+                id=id,
                 properties={
                     'airspace': sr.record[0],
                     'lo': loAlt,
@@ -208,8 +209,13 @@ def process_airspace_file(self, filename):
                 },
                 bounds=bounds
             )
-            store.insert(feature)
+            store.update(
+                {'id': id}, {'$set': feature}, upsert=True)
             count += 1
+            self.update_state(
+                state='PROCESSING',
+                meta={'current': count}
+            )
         # Delete the temp files
         remove(shp_fn)
         remove(shx_fn)
