@@ -172,6 +172,7 @@ def process_airspace_file(self, filename):
     zf = ZipFile(filename)
     # Open the database
     store = process_airspace_file.mongo.airspace.airspaces
+    store.remove()
     # Iterate different airspace types
     count = 0
     for airspace_name, airspace_class in airspace_files.iteritems():
@@ -211,8 +212,7 @@ def process_airspace_file(self, filename):
                 },
                 bounds=bounds
             )
-            store.update(
-                {'id': id}, {'$set': feature}, upsert=True)
+            store.insert(feature)
             count += 1
             self.update_state(
                 state='PROCESSING',
