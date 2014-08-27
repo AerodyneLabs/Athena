@@ -33,7 +33,9 @@ nav_fields = {
 }
 nav_filter = ['VOR/DME', 'VORTAC']
 airspace_files = {
-    'Shape_Files/class_b': 'Class B'
+    'Shape_Files/class_b': 'Class B',
+    'Shape_Files/class_c': 'Class C',
+    'Shape_Files/class_d': 'Class D'
 }
 
 
