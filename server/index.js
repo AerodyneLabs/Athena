@@ -1,6 +1,7 @@
 var restify = require('restify');
 var socketio = require('socket.io');
 var monk = require('monk')('localhost/atmosphere');
+var airspace = require('monk')('localhost/airspace');
 var celery = require('node-celery').createClient({
 	CELERY_BROKER_URL: 'amqp://guest:guest@localhost:5672',
 	CELERY_RESULT_BACKEND: 'amqp',
@@ -31,7 +32,7 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 	}, function(err, docs) {
 		if(docs) {
 			res.send(docs);
-			return;
+			next();
 		} else {
 			var result = celery.call(
 				'atmosphereTasks.extract_forecast',
@@ -46,6 +47,31 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 				res.send(data);
 			});
 		}
+	});
+});
+
+server.get('api/navaids/:latitude/:longitude', function(req, res, next) {
+	var lat = Number(req.params.latitude);
+	var lon = Number(req.params.longitude);
+	var store = airspace.get('navaids');
+	store.find({
+		'loc': {
+			'$near': {
+				'$geometry': {
+					'type': 'Point',
+					'coordinates': [lon, lat]
+				}
+			}
+		}
+	}, {
+		'limit': 10
+	}, function(err, docs) {
+		if(err) {
+			res.send(400, err);
+		} else {
+			res.send(docs);
+		}
+		next()
 	});
 });
 
