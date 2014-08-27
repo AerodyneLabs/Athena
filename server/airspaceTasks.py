@@ -6,7 +6,7 @@ from collections import namedtuple
 from datetime import datetime
 from os import remove
 from shapefile import Reader
-from geojson import Feature, Point
+from geojson import Feature, Point, Polygon
 from worker import app
 from mongoTask import MongoTask
 
@@ -189,6 +189,14 @@ def process_airspace_file(self, filename):
                 except ValueError:
                     pass
             hiAlt = float(sr.record[3])
+            bbox = sr.shape.bbox
+            bounds = Polygon([[
+                (bbox[0], bbox[1]),
+                (bbox[2], bbox[1]),
+                (bbox[2], bbox[3]),
+                (bbox[0], bbox[3]),
+                (bbox[0], bbox[1])
+            ]])
             feature = Feature(
                 geometry=sr.shape,
                 id=sr.record[1],
@@ -196,7 +204,8 @@ def process_airspace_file(self, filename):
                     'airspace': sr.record[0],
                     'lo': loAlt,
                     'hi': hiAlt
-                }
+                },
+                bounds=bounds
             )
             store.insert(feature)
             count += 1
