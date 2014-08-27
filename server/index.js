@@ -55,7 +55,7 @@ server.get('api/navaids/:latitude/:longitude', function(req, res, next) {
 	var lon = Number(req.params.longitude);
 	var store = airspace.get('navaids');
 	store.find({
-		'loc': {
+		'geometry': {
 			'$near': {
 				'$geometry': {
 					'type': 'Point',
@@ -69,7 +69,11 @@ server.get('api/navaids/:latitude/:longitude', function(req, res, next) {
 		if(err) {
 			res.send(400, err);
 		} else {
-			res.send(docs);
+			var features = {
+				'type': 'FeatureCollection',
+				'features': docs
+			}
+			res.send(features);
 		}
 		next()
 	});
