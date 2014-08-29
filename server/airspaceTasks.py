@@ -40,7 +40,10 @@ airspace_files = {
 
 
 def get_field(record, field):
+    """Return the contents of a field from the record as a string."""
+    # Extract field based on start position and length
     value = record[field.start-1:field.start+field.length-1]
+    # Strip white space based on justification
     if field.just == 'l':
         return value.rstrip()
     elif field.just == 'r':
@@ -50,10 +53,14 @@ def get_field(record, field):
 
 
 def parse_dms(x):
+    """Return a float representation of a dd-mm-ss.ssH string."""
+    # Split the string into tokens
     tokens = x.split('-')
+    # Convert string tokens to floats
     deg = float(tokens[0])
     min = float(tokens[1])
     sec = float(tokens[2][:-1])
+    # Parse the hemisphere value
     dec = 1.0
     if tokens[2][-1] in ['S', 'W']:
         dec = -1.0
@@ -61,7 +68,10 @@ def parse_dms(x):
 
 
 def parse_variation(x):
+    """Return a float representation of a ddH string."""
+    # Convert degrees to float
     deg = float(x[:-1])
+    # Parse the hemisphere value
     if x[-1] == 'E':
         return deg
     else:
@@ -69,6 +79,7 @@ def parse_variation(x):
 
 
 def parse_boolean(x):
+    """Return a boolean representation of a y/n string."""
     if x in ['y', 'Y']:
         return True
     else:
@@ -76,15 +87,20 @@ def parse_boolean(x):
 
 
 def get_latest_date():
-    # Find latest date on the 56 day cycle
+    """Return the latest date on the 56 day update cycle."""
+    # Reference date
     ref_ord = date(2014, 5, 29).toordinal()
+    # Current date
     cur_ord = date.today().toordinal()
+    # Compute cycles since reference
     seq = int(floor((cur_ord - ref_ord) / 56))
+    # Convert cycles back to date
     latest = date.fromordinal(seq * 56 + ref_ord)
     return latest
 
 
 def get_latest_url(filename):
+    """Return the root URL of NFDC file server for latest cycle."""
     prefix = 'https://nfdc.faa.gov/webContent/56DaySub/'
     folder = '{0}/'.format(get_latest_date())
     return prefix + folder + filename
@@ -132,22 +148,29 @@ def process_nav_file(self, filename):
                     properties['valid'] = datetime.strptime(
                         get_field(line, nav_fields['valid']),
                         '%m/%d/%Y')
-                    properties['name'] = get_field(line, nav_fields['name'])
-                    properties['city'] = get_field(line, nav_fields['city'])
-                    properties['state'] = get_field(line, nav_fields['state'])
-                    properties['country'] = get_field(line, nav_fields['country'])
+                    properties['name'] = get_field(
+                        line, nav_fields['name'])
+                    properties['city'] = get_field(
+                        line, nav_fields['city'])
+                    properties['state'] = get_field(
+                        line, nav_fields['state'])
+                    properties['country'] = get_field(
+                        line, nav_fields['country'])
                     properties['common'] = parse_boolean(get_field(
                         line, nav_fields['common']))
                     properties['public'] = parse_boolean(get_field(
                         line, nav_fields['public']))
-                    lat = parse_dms(get_field(line, nav_fields['latitude']))
-                    lon = parse_dms(get_field(line, nav_fields['longitude']))
+                    lat = parse_dms(get_field(
+                        line, nav_fields['latitude']))
+                    lon = parse_dms(get_field(
+                        line, nav_fields['longitude']))
                     point = Point((lon, lat))
                     properties['elevation'] = float(get_field(
                         line, nav_fields['elevation']))
                     properties['variation'] = parse_variation(get_field(
                         line, nav_fields['variation']))
-                    properties['status'] = get_field(line, nav_fields['status'])
+                    properties['status'] = get_field(
+                        line, nav_fields['status'])
                     navaid = Feature(
                         geometry=point, properties=properties, id=id)
                     store.update(
@@ -183,7 +206,6 @@ def process_airspace_file(self, filename):
         # Open interface to shapefile
         sf = Reader(shp_fn)
         # Iterate over shapes
-        cur_airspace = ''
         for sr in sf.shapeRecords():
             id = sr.record[1]
             loAlt = 0
