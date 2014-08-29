@@ -215,4 +215,4 @@ def download_model_run(analysis_time):
     job = group(
         download_forecast.s(analysis_time, hour)
         for hour in forecast_hours)
-    res = job.apply_async()
+    job.apply_async()
