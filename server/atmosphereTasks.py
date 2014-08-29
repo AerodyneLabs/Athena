@@ -13,6 +13,7 @@ TEMP_DIR = 'data/'
 
 
 def get_url(model_run, forecast_hours):
+    """Return the URL for the given forecast of the given model run."""
     server_address = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/'
     model_folder = 'gfs.{year:04d}{month:02d}{day:02d}{run:02d}/'.format(
         year=model_run.year,
@@ -28,6 +29,7 @@ def get_url(model_run, forecast_hours):
 
 
 def process_file(input_name):
+    """Strip irrelevant records and return the compressed filename."""
     # Open grib file
     grib_file = grib(input_name)
     # Select records from grib file
@@ -69,6 +71,7 @@ def generate_sounding(
         lat=None, lon=None,
         height=None, pressure=None, temperature=None, u=None, v=None,
         **kwargs):
+    """Return a sounding object generated from the input data."""
     sounding = {
         'loc': {
             'type': 'Point',
@@ -86,6 +89,7 @@ def generate_sounding(
 
 @app.task(base=MongoTask, bind=True)
 def extract_forecast(self, forecast_time, lat, lon):
+    """Extract a given sounding from the database and save it."""
     if not isinstance(forecast_time, datetime):
         forecast_time = datetime.strptime(
             forecast_time.split('.')[0],
@@ -146,6 +150,7 @@ def extract_forecast(self, forecast_time, lat, lon):
 
 @app.task(base=MongoTask, bind=True)
 def download_forecast(self, analysis_time, forecast_hours):
+    """Download a forecast and store it as a compressed numpy file."""
     # Get URL of file on web
     file_url = get_url(analysis_time, forecast_hours)
     # Compute forecast datetime
@@ -196,6 +201,7 @@ def download_forecast(self, analysis_time, forecast_hours):
 
 @app.task()
 def download_model_run(analysis_time):
+    """Download a complete model run."""
     forecast_hours = [
         0, 3, 6, 9, 12,
         15, 18, 21, 24,
@@ -212,7 +218,9 @@ def download_model_run(analysis_time):
         147, 150, 153, 156,
         159, 162, 165, 168
     ]
+    # Create the task group
     job = group(
         download_forecast.s(analysis_time, hour)
         for hour in forecast_hours)
+    # Execute the group
     job.apply_async()
