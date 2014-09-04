@@ -61,12 +61,7 @@ class Atmosphere:
     def bound_location(self, lat, lon):
         min_lat, max_lat = self.round_location(lat)
         min_lon, max_lon = self.round_location(lon)
-        return [
-            [min_lon, min_lat],
-            [max_lon, min_lat],
-            [max_lon, max_lat],
-            [min_lon, max_lat]
-        ]
+        return [min_lat, max_lat], [min_lon, max_lon]
 
     @staticmethod
     def nearest(point, points):
@@ -77,11 +72,11 @@ class Atmosphere:
 
     def get(self, time, lat, lon, alt):
         time_bounds = self.bound_time(time)
-        loc_bounds = self.bound_location(lat, lon)
+        lat_bounds, lon_bounds = self.bound_location(lat, lon)
         if self.method == 'nearest':
             sounding = self.get_sounding(
                 Atmosphere.nearest(time, time_bounds),
-                Atmosphere.nearest(lat, [loc_bounds[0][1], loc_bounds[2][1]]),
-                Atmosphere.nearest(lon, [loc_bounds[0][0], loc_bounds[2][1]])
+                Atmosphere.nearest(lat, lat_bounds),
+                Atmosphere.nearest(lon, lon_bounds)
             )
         return sounding
