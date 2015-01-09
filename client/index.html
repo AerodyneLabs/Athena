@@ -15,17 +15,13 @@
 		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mattis vulputate tellus vel malesuada. Nam sollicitudin porta commodo. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed tincidunt porta porttitor. Aliquam at urna leo. Morbi porta purus in lorem tincidunt, vitae pharetra leo mattis. Maecenas molestie justo vel ex ultrices, ac consequat diam hendrerit. Suspendisse consectetur fringilla porttitor. Cras a tincidunt lacus. Ut lacus nisi, lacinia vel neque a, pellentesque feugiat augue. Proin sit amet libero commodo velit ultricies scelerisque id quis magna. In elit velit, aliquet vel ligula et, auctor hendrerit nisl. In hac habitasse platea dictumst.</p>
 	</script>
 
-	<script type="text/x-handlebars" data-template-name="soundings">
+	<script type="text/x-handlebars" data-template-name="forecastPeriods">
 		<h2>Soundings</h2>
 		<ul>
-			{{#each sounding in model}}
-				<li>{{sounding.forecast}}</li>
+			{{#each forecastPeriod in model}}
+				<li>{{forecastPeriod.forecast}}</li>
 			{{/each}}
 		</ul>
-	</script>
-
-	<script type="text/x-handlebars" data-template-name="sounding">
-		<h2>Sounding</h2>
 	</script>
 
 	<script src="bower_components/jquery/jquery.js"></script>

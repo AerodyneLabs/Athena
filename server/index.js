@@ -20,11 +20,11 @@ var io = socketio.listen(server);
 
 server.get('api/version', version);
 
-server.get('api/soundings', function(req, res, next) {
+server.get('api/forecastPeriods', function(req, res, next) {
 	var store = monk.get('fs.files');
 	store.find({}, {fields:'-chunkSize -length -uploadDate -md5', sort:{forecast: 1}}, function(err, docs) {
 		if(docs) {
-			res.send({'soundings':docs});
+			res.send({'forecastPeriods':docs});
 			next();
 		} else {
 			res.send(err);

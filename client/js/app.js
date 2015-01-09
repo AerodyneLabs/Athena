@@ -7,17 +7,17 @@ App.ApplicationAdapter = DS.RESTAdapter.extend({
 App.Router.map(function() {
 	this.route('about');
 
-	this.resource('soundings');
+	this.resource('forecastPeriods');
 	//this.resource('sounding', {path: '/sounding/:sounding_id'});
 });
 
-App.SoundingsRoute = Ember.Route.extend({
+App.ForecastPeriodsRoute = Ember.Route.extend({
 	model: function() {
-		return this.store.find('sounding');
+		return this.store.find('forecastPeriod');
 	}
 });
 
-App.Sounding = DS.Model.extend({
+App.ForecastPeriod = DS.Model.extend({
 	analysis: DS.attr('date'),
 	forecast: DS.attr('date')
 });
