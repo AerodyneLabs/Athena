@@ -24,7 +24,7 @@ server.get('api/soundings', function(req, res, next) {
 	var store = monk.get('fs.files');
 	store.find({}, {fields:'-chunkSize -length -uploadDate -md5', sort:{forecast: 1}}, function(err, docs) {
 		if(docs) {
-			res.send(docs);
+			res.send({'soundings':docs});
 			next();
 		} else {
 			res.send(err);
