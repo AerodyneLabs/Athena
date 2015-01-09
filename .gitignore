@@ -1,13 +1,17 @@
-# Application
-data/
+# See http://help.github.com/ignore-files/ for more about ignoring files.
 
-# vim
-*.swp
-*.swo
+# compiled output
+/dist
+/tmp
 
-# Python
-__pychache__/
-*.py[cod]
+# dependencies
+/node_modules
+/bower_components
 
-# Node
-node_modules/
+# misc
+/.sass-cache
+/connect.lock
+/coverage/*
+/libpeerconnection.log
+npm-debug.log
+testem.log

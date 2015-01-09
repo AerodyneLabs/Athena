@@ -1,32 +1,51 @@
 {
-  "name": "Athena",
-  "version": "0.0.2",
+  "name": "athena",
+  "version": "0.0.1",
   "description": "Online high altitude ballooning portal",
-  "main": "server/index.js",
+  "private": true,
+  "directories": {
+    "doc": "doc",
+    "test": "tests"
+  },
   "scripts": {
-    "start": "node server/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "ember server",
+    "build": "ember build",
+    "test": "ember test"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/AerodyneLabs/Athena.git"
   },
-  "author": "Ethan Harstad <ethanharstad@gmail.com>",
-  "contributors": {},
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/AerodyneLabs/Athena/issues"
   },
   "homepage": "https://github.com/AerodyneLabs/Athena",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "author": "Ethan Harstad <ethanharstad@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
-    "bower": "^1.3.8"
+    "broccoli-asset-rev": "^2.0.0",
+    "broccoli-ember-hbs-template-compiler": "^1.6.1",
+    "ember-cli": "0.1.5",
+    "ember-cli-content-security-policy": "0.3.0",
+    "ember-cli-dependency-checker": "0.0.7",
+    "ember-cli-esnext": "0.1.1",
+    "ember-cli-ic-ajax": "0.1.1",
+    "ember-cli-inject-live-reload": "^1.3.0",
+    "ember-cli-qunit": "0.1.2",
+    "ember-data": "1.0.0-beta.12",
+    "ember-export-application-global": "^1.0.0",
+    "express": "^4.8.5",
+    "glob": "^4.0.5"
   },
   "dependencies": {
-    "mongodb": "^1.4.8",
+    "mongodb": "^1.4.28",
     "mongoskin": "^1.4.4",
-    "monk": "^0.9.0",
+    "monk": "^0.9.1",
     "node-celery": "^0.2.2",
-    "restify": "^2.8.1",
-    "socket.io": "^1.0.6"
+    "restify": "^2.8.4",
+    "socket.io": "^1.2.1"
   }
 }
