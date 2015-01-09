@@ -20,6 +20,18 @@ var io = socketio.listen(server);
 
 server.get('api/version', version);
 
+server.get('api/soundings', function(req, res, next) {
+	var store = monk.get('fs.files');
+	store.find({}, {fields:'-chunkSize -length -uploadDate -md5', sort:{forecast: 1}}, function(err, docs) {
+		if(docs) {
+			res.send(docs);
+			next();
+		} else {
+			res.send(err);
+		}
+	});
+});
+
 // Get sounding from database
 server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, next) {
 	var time = new Date(Number(req.params.timestamp));
