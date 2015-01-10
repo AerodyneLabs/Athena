@@ -1,6 +1,10 @@
 <h1>Forecast Periods</h1>
 <ul>
-	{{#each forecastPeriod in model}}
-		<li>{{forecastPeriod.forecast}}</li>
+	{{#each period in model}}
+		<li>
+			{{#link-to 'forecastPeriod' period}}
+				{{period.forecast}}
+			{{/link-to}}
+		</li>
 	{{/each}}
 </ul>
