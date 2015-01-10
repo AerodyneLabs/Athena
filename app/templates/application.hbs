@@ -5,12 +5,16 @@
 				<span class="sr-only">Toggle navigation</span>
 				...
 			</button>
-			<a class="navbar-brand" href="#">Athena</a>
+			{{#link-to "index" class="navbar-brand"}}Athena{{/link-to}}
 		</div>
 		<div class="collapse navbar-collapse" id="navbar-collapse">
 			<ul class="nav navbar-nav">
-				<li><a href="#">Link 1</a></li>
-				<li><a href="#">Link 2</a></li>
+				{{#link-to "forecastPeriods" tagName="li" href=false}}
+					{{#link-to "forecastPeriods"}}Forecasts{{/link-to}}
+				{{/link-to}}
+				{{#link-to "about" tagName="li" href=false}}
+					{{#link-to "about"}}About{{/link-to}}
+				{{/link-to}}
 			</ul>
 		</div>
 	</div>
