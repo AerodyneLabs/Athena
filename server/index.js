@@ -8,27 +8,35 @@ var celery = require('node-celery').createClient({
 	CELERY_TASK_RESULT_EXPIRES: 3600
 });
 
-function version(req, res, next) {
+var server = restify.createServer();
+server.use(restify.queryParser());
+
+var io = socketio.listen(server);
+
+server.get('api/version', function version(req, res, next) {
 	res.send({
 		version: '0.0.1'
 	});
-	next();
-}
-
-var server = restify.createServer();
-var io = socketio.listen(server);
-
-server.get('api/version', version);
+	return next();
+});
 
 server.get('api/forecastPeriods', function(req, res, next) {
 	var store = monk.get('fs.files');
-	store.find({}, {fields:'-chunkSize -length -uploadDate -md5', sort:{forecast: 1}}, function(err, docs) {
-		if(docs) {
-			res.send({'forecastPeriods':docs});
-			next();
-		} else {
-			res.send(err);
-		}
+	store.find({}, '-chunkSize -md5', function(err, docs) {
+		if(err) return next(err);
+
+		res.send({'forecastPeriods':docs});
+		return next();
+	});
+});
+
+server.get('api/forecastPeriods/:id', function(req, res, next) {
+	var store = monk.get('fs.files');
+	store.findById(req.params.id, '-chunkSize -md5', function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'forecastPeriod':doc});
+		return next();
 	});
 });
 

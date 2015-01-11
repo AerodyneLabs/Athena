@@ -2,6 +2,6 @@ import Ember from 'ember';
 
 export default Ember.Route.extend({
 	model: function(params) {
-		return this.store.find('forecastPeriod', {forecast: params.forecast});
+		return this.store.find('forecastPeriod', params.id);
 	}
 });
