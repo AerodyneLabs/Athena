@@ -1,0 +1,26 @@
+<h1>Sounding</h1>
+Forecast: {{forecast}}<br/>
+Analysis: {{analysis}}<br/>
+Location: {{loc.latitude}}, {{loc.longitude}}<br/>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Altitude (m)</th>
+			<th>Temperature (K)</th>
+			<th>Pressure (Pa)</th>
+			<th>Wind Speed (m/s)</th>
+			<th>Wind Diretion</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#each level in profile}}
+			<tr>
+				<td>{{level.h}}</td>
+				<td>{{level.t}}</td>
+				<td>{{level.p}}</td>
+				<td>{{level.u}}</td>
+				<td>{{level.v}}</td>
+			</tr>
+		{{/each}}
+	</tbody>
+</table>

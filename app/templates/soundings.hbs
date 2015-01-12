@@ -1,0 +1,10 @@
+<h1>Soundings</h1>
+<ul>
+	{{#each sounding in model}}
+		<li>
+			{{#link-to 'sounding' sounding.id}}
+				{{sounding.forecast}} - ({{sounding.loc.latitude}},{{sounding.loc.longitude}})
+			{{/link-to}}
+		</li>
+	{{/each}}
+</ul>

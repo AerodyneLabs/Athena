@@ -40,6 +40,26 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 	});
 });
 
+server.get('api/soundings', function(req, res, next) {
+	var store = monk.get('forecast');
+	store.find({}, function(err, docs) {
+		if(err) return next(err);
+
+		res.send({'soundings':docs});
+		return next();
+	});
+});
+
+server.get('api/soundings/:id', function(req, res, next) {
+	var store = monk.get('forecast');
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'sounding':doc});
+		return next();
+	});
+});
+
 // Get sounding from database
 server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, next) {
 	var time = new Date(Number(req.params.timestamp) * 1000);

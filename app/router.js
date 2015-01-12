@@ -6,9 +6,17 @@ var Router = Ember.Router.extend({
 });
 
 Router.map(function() {
-  this.resource("about", function() {});
-  this.resource("forecastPeriods", function() {});
-  this.resource("forecastPeriod", {path: "/forecastPeriod/:id"}, function() {});
+  this.route("about");
+
+  this.route("forecastPeriods");
+  this.route("forecastPeriod", {
+    path: "/foreastPeriod/:id"
+  });
+
+  this.route("soundings");
+  this.route("sounding", {
+		path: "/sounding/:id"
+	});
 });
 
 export default Router;

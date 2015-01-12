@@ -2,7 +2,7 @@
 <ul>
 	{{#each period in model}}
 		<li>
-			{{#link-to 'forecastPeriod' period}}
+			{{#link-to 'forecastPeriod' period.id}}
 				{{period.forecast}}
 			{{/link-to}}
 		</li>
