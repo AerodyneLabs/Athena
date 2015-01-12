@@ -42,7 +42,7 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 
 // Get sounding from database
 server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, next) {
-	var time = new Date(Number(req.params.timestamp));
+	var time = new Date(Number(req.params.timestamp) * 1000);
 	var lat = Number(req.params.latitude);
 	var lon = Number(req.params.longitude);
 	var store = monk.get('forecast');
@@ -51,7 +51,7 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 		'loc.coordinates':[lon, lat]
 	}, function(err, docs) {
 		if(docs) {
-			res.send(docs);
+			res.send({sounding:docs});
 			next();
 		} else {
 			var result = celery.call(
@@ -60,7 +60,7 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 			);
 			result.once('success', function(data) {
 				store.findById(data.result[0], function(err, doc) {
-					res.send(doc);
+					res.send({sounding:doc});
 				});
 			});
 			result.once('failed', function(data) {

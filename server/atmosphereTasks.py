@@ -77,10 +77,10 @@ def generate_sounding(
             'type': 'Point',
             'coordinates': [lon, lat]
         },
-        'data': []
+        'profile': []
     }
     for h, p, t, u, v in zip(height, pressure, temperature, u, v):
-        sounding['data'].append({
+        sounding['profile'].append({
             'h': h, 'p': p, 't': t, 'u': u, 'v': v
         })
 
