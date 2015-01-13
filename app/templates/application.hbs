@@ -19,6 +19,18 @@
 					{{#link-to "about"}}About{{/link-to}}
 				{{/link-to}}
 			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+						Settings <span class="caret"></span>
+					</a>
+					<div class="dropdown-menu" role="menu">
+						{{#em-form submit_button=false model=controller}}
+							{{em-select property="units" label="Unit System" contentBinding="unitsOptions" optionValuePath="content.id" optionLabelPath="content.name"}}
+						{{/em-form}}
+					</div>
+				</li>
+			</ul>
 		</div>
 	</div>
 </nav>

@@ -8,22 +8,23 @@ Location: {{loc.latitude}}, {{loc.longitude}}<br/>
 <table class="table">
 	<thead>
 		<tr>
-			<th>Altitude (m)</th>
-			<th>Temperature (K)</th>
-			<th>Pressure (Pa)</th>
-			<th>Easterly Wind Speed (m/s)</th>
-			<th>Northerly Wind Speed (m/s)</th>
+			<th>Altitude ({{units-unit controllers.application.units "altitude"}})</th>
+			<th>Temperature ({{units-unit controllers.application.units "temperature"}})</th>
+			<th>Pressure ({{units-unit controllers.application.units "pressure"}})</th>
+			<th>Easterly Wind Speed ({{units-unit controllers.application.units "lowSpeed"}})</th>
+			<th>Northerly Wind Speed ({{units-unit controllers.application.units "lowSpeed"}})</th>
 		</tr>
 	</thead>
 	<tbody>
 		{{#each level in profile}}
 			<tr>
-				<td>{{level.h}}</td>
-				<td>{{level.t}}</td>
-				<td>{{level.p}}</td>
-				<td>{{level.u}}</td>
-				<td>{{level.v}}</td>
+				<td>{{units-value controllers.application.units "altitude" level.h}}</td>
+				<td>{{units-value controllers.application.units "temperature" level.t}}</td>
+				<td>{{units-value controllers.application.units "pressure" level.p}}</td>
+				<td>{{units-value controllers.application.units "lowSpeed" level.u}}</td>
+				<td>{{units-value controllers.application.units "lowSpeed" level.v}}</td>
 			</tr>
 		{{/each}}
 	</tbody>
 </table>
+{{debugger}}
