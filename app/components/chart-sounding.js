@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import convert from 'athena/helpers/units';
 
 export default Ember.Component.extend({
 	tagName: 'svg',
@@ -26,15 +27,16 @@ export default Ember.Component.extend({
 		var width = this.get('w');
 		var height = this.get('h');
 		var data = this.get('data');
+		var units = this.get('units');
 		var svg = d3.select('#'+this.get('elementId'));
 
 		var xScale = d3.scale.linear().range([0, width]);
 		xScale.domain(d3.extent(data, function(d) {
-			return d['t'];
+			return convert(units, 'temperature', d['t']).value;
 		}));
 		var yScale = d3.scale.linear().range([height, 0]);
 		yScale.domain(d3.extent(data, function(d) {
-			return d['h'];
+			return convert(units, 'altitude', d['h']).value;
 		}));
 
 		var xAxis = d3.svg.axis().scale(xScale).orient('bottom');
@@ -42,21 +44,17 @@ export default Ember.Component.extend({
 
 		var line = d3.svg.line()
 			.x(function(d) {
-				console.log('x ' + d['t'] + ' ' + xScale(d['t']));
-				return xScale(d['t']);
+				return xScale(convert(units, 'temperature', d['t']).value);
 			})
 			.y(function(d) {
-				console.log('y ' + d['h'] + ' ' + yScale(d['h']));
-				return yScale(d['h']);
+				return yScale(convert(units, 'altitude', d['h']).value);
 			})
 			.interpolate('monotone');
-
-		console.log(line(data));
 
 		svg.select('.axis.x').call(xAxis);
 		svg.select('.axis.y').call(yAxis);
 		svg.select('.data').attr('d', line(data));
-	},
+	}.observes('units'),
 
 	didInsertElement: function() {
 		this.draw();

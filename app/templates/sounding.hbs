@@ -3,7 +3,7 @@ Forecast: {{forecast}}<br/>
 Analysis: {{analysis}}<br/>
 Location: {{loc.latitude}}, {{loc.longitude}}<br/>
 
-{{chart-sounding data=profile width=400 height=400}}
+{{chart-sounding data=profile units=controllers.application.units width=400 height=400}}
 
 <table class="table">
 	<thead>
@@ -11,8 +11,8 @@ Location: {{loc.latitude}}, {{loc.longitude}}<br/>
 			<th>Altitude ({{units-unit controllers.application.units "altitude"}})</th>
 			<th>Temperature ({{units-unit controllers.application.units "temperature"}})</th>
 			<th>Pressure ({{units-unit controllers.application.units "pressure"}})</th>
-			<th>Easterly Wind Speed ({{units-unit controllers.application.units "lowSpeed"}})</th>
-			<th>Northerly Wind Speed ({{units-unit controllers.application.units "lowSpeed"}})</th>
+			<th>Easterly Wind Speed ({{units-unit controllers.application.units "highSpeed"}})</th>
+			<th>Northerly Wind Speed ({{units-unit controllers.application.units "highSpeed"}})</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -21,8 +21,8 @@ Location: {{loc.latitude}}, {{loc.longitude}}<br/>
 				<td>{{units-value controllers.application.units "altitude" level.h}}</td>
 				<td>{{units-value controllers.application.units "temperature" level.t}}</td>
 				<td>{{units-value controllers.application.units "pressure" level.p}}</td>
-				<td>{{units-value controllers.application.units "lowSpeed" level.u}}</td>
-				<td>{{units-value controllers.application.units "lowSpeed" level.v}}</td>
+				<td>{{units-value controllers.application.units "highSpeed" level.u}}</td>
+				<td>{{units-value controllers.application.units "highSpeed" level.v}}</td>
 			</tr>
 		{{/each}}
 	</tbody>
