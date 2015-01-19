@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import convert from 'athena/helpers/units';
-import round from 'athena/helpers/round-number';
+import round from 'athena/helpers/round';
 
 export function unitsValue(system, type, value, digits) {
   var out = convert(system, type, value).value;
