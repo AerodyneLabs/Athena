@@ -5,7 +5,7 @@ export default Ember.Component.extend({
 	tagName: 'svg',
 	attributeBindings: 'width height'.w(),
 
-	margin: {top: 20, right: 20, bottom: 30, left: 100},
+	margin: {top: 20, right: 20, bottom: 30, left: 70},
 
 	w: function() {
 		return this.get('width') - this.get('margin.left') - this.get('margin.right');
@@ -28,6 +28,8 @@ export default Ember.Component.extend({
 		var height = this.get('h');
 		var data = this.get('data');
 		var units = this.get('units');
+		var altUnit = convert(units, 'altitude', 0).unit;
+		var tempUnit = convert(units, 'temperature', 0).unit;
 		var svg = d3.select('#'+this.get('elementId'));
 
 		var xScale = d3.scale.linear().range([0, width]);
@@ -51,9 +53,21 @@ export default Ember.Component.extend({
 			})
 			.interpolate('monotone');
 
-		svg.select('.axis.x').call(xAxis);
-		svg.select('.axis.y').call(yAxis);
 		svg.select('.data').attr('d', line(data));
+		svg.select('.axis.x')
+			.call(xAxis)
+			.select('text')
+			.attr('x', width)
+			.attr('dy', '-.5em')
+			.attr('text-anchor', 'end')
+			.text('Temperature (' + tempUnit + ')');
+		svg.select('.axis.y')
+			.call(yAxis)
+			.select('text')
+			.attr('transform', 'rotate(-90)')
+			.attr('dy', '1em')
+			.style('text-anchor', 'end')
+			.text('Altitude (' + altUnit + ')');
 	}.observes('units'),
 
 	didInsertElement: function() {

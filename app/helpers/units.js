@@ -13,10 +13,10 @@ export default function(system, type, value) {
     }
   } else if(type === 'temperature') {
     if(system === 'metric') {
-      out.unit = new Ember.Handlebars.SafeString('&deg;C');
+      out.unit = new Ember.Handlebars.SafeString('ºC');
       out.value = val - 273.15;
     } else {
-      out.unit = new Ember.Handlebars.SafeString('&deg;F');
+      out.unit = new Ember.Handlebars.SafeString('ºF');
       out.value = ((val - 273.15) * 1.8) + 32.0;
     }
   } else if(type === 'distance') {

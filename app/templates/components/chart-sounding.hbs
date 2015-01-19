@@ -1,5 +1,9 @@
 <g {{bind-attr transform=transformG}}>
-	<g class="x axis" {{bind-attr transform=transformX}}></g>
-	<g class="y axis"></g>
 	<path class="data"></path>
+	<g class="x axis" {{bind-attr transform=transformX}}>
+		<text>X-Label</text>
+	</g>
+	<g class="y axis">
+		<text>Y-Label</text>
+	</g>
 </g>
