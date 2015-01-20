@@ -1,10 +1,11 @@
 <g {{bind-attr transform=transformG}}>
-	<path class="data temperature"></path>
-	<path class="data wind"></path>
-	<g class="axis temperature" {{bind-attr transform=transformX}}>
-		<text class="axis-label" x=".5em" y="-.75em" dy=".35em">
-			Temperature ({{units-unit units "temperature"}})
-		</text>
+	<g class="temperature"  {{bind-attr transform=transformX}}>
+		<path class="data temperature"></path>
+		<g class="axis">
+			<text class="axis-label" x=".5em" y="-.75em" dy=".35em">
+				Temperature ({{units-unit units "temperature"}})
+			</text>
+		</g>
 	</g>
 	<g class="axis pressure">
 		<text class="axis-label" y=".75em" dy=".35em" transform="rotate(-90)">
@@ -16,9 +17,12 @@
 			Altitude ({{units-unit units "altitude"}})
 		</text>
 	</g>
-	<g class="axis wind" {{bind-attr transform=transformWind}}>
-		<text class="axis-label" x=".5em" y="-.75em" dy=".35em">
-			Wind Speed ({{units-unit units "highSpeed"}})
-		</text>
+	<g class="wind" {{bind-attr transform=transformWind}}>
+		<path class="data wind"></path>
+		<g class="axis">
+			<text class="axis-label" x=".5em" y="-.75em" dy=".35em">
+				Wind Speed ({{units-unit units "highSpeed"}})
+			</text>
+		</g>
 	</g>
 </g>

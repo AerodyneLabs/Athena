@@ -92,28 +92,28 @@ export default Ember.Component.extend({
 				return tempScale(convert(units, 'temperature', d['t']).value);
 			})
 			.y(function(d) {
-				return altScale(convert(units, 'altitude', d['h']).value);
+				return altScale(convert(units, 'altitude', d['h']).value) - height;
 			})
 			.interpolate('linear');
 
 		var wind = d3.svg.line()
 			.x(function(d) {
-				return windScale(convert(units, 'highSpeed', d['ws']).value) + tempWidth + padding;
+				return windScale(convert(units, 'highSpeed', d['ws']).value);
 			})
 			.y(function(d) {
-				return altScale(convert(units, 'altitude', d['h']).value);
+				return altScale(convert(units, 'altitude', d['h']).value) - height;
 			})
 			.interpolate('linear');
 
 		svg.select('.data.temperature').attr('d', line(data));
-		svg.select('.data.wind').attr('d', wind(data));
-		svg.select('.axis.temperature')
+		svg.select('.wind > .data').attr('d', wind(data));
+		svg.select('.temperature .axis')
 			.call(tempAxis);
 		svg.select('.axis.altitude')
 			.call(altAxis);
 		svg.select('.axis.pressure')
 			.call(presAxis);
-		svg.select('.axis.wind')
+		svg.select('.wind .axis')
 			.call(windAxis);
 	}.observes('units'),
 
