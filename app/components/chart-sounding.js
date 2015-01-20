@@ -79,7 +79,9 @@ export default Ember.Component.extend({
 		var presAxis = d3.svg.axis()
 			.scale(presScale)
 			.orient('left')
-			.tickFormat(d3.format('d'));
+			.tickFormat(function(d) {
+				return presScale.tickFormat(10, d3.format(',d'))(d);
+			});
 		var windAxis = d3.svg.axis()
 			.scale(windScale)
 			.orient('bottom')
