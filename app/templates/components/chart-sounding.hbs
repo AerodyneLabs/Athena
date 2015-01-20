@@ -1,6 +1,6 @@
 <g {{bind-attr transform=transformG}}>
 	<g class="temperature"  {{bind-attr transform=transformX}}>
-		<path class="data temperature"></path>
+		<path class="data"></path>
 		<g class="axis">
 			<text class="axis-label" x=".5em" y="-.75em" dy=".35em">
 				Temperature ({{units-unit units "temperature"}})
@@ -18,7 +18,8 @@
 		</text>
 	</g>
 	<g class="wind" {{bind-attr transform=transformWind}}>
-		<path class="data wind"></path>
+		<path class="data"></path>
+		<g class="direction"></g>
 		<g class="axis">
 			<text class="axis-label" x=".5em" y="-.75em" dy=".35em">
 				Wind Speed ({{units-unit units "highSpeed"}})

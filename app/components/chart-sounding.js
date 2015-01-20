@@ -46,7 +46,6 @@ export default Ember.Component.extend({
 		var units = this.get('units');
 		var tempWidth = this.get('tempWidth');
 		var windWidth = this.get('windWidth');
-		var padding = this.get('padding');
 		var svg = d3.select('#'+this.get('elementId'));
 
 		var tempScale = d3.scale.linear()
@@ -105,8 +104,23 @@ export default Ember.Component.extend({
 			})
 			.interpolate('linear');
 
-		svg.select('.data.temperature').attr('d', line(data));
+		svg.select('.temperature > .data').attr('d', line(data));
 		svg.select('.wind > .data').attr('d', wind(data));
+		svg.select('.wind > .direction')
+			.selectAll('text')
+			.data(data, function(d) {
+				return d['wd'];
+			})
+			.enter()
+			.append('text')
+			.attr('font-family', 'weathericons')
+			.attr('dy', '.35em')
+			.attr('transform', function(d) {
+				var x = windScale(convert(units, 'highSpeed', d['ws']).value) - 10;
+				var y = altScale(convert(units, 'altitude', d['h']).value) - height;
+				return 'translate(' + x + ',' + y + '), rotate(' + d['wd'] + ')';
+			})
+			.text('\uf0b1');
 		svg.select('.temperature .axis')
 			.call(tempAxis);
 		svg.select('.axis.altitude')
