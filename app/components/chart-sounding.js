@@ -66,9 +66,9 @@ export default Ember.Component.extend({
 			}));
 		var windScale = d3.scale.linear()
 			.range([0, windWidth])
-			.domain(d3.extent(data, function(d) {
+			.domain([0, d3.max(data, function(d) {
 				return convert(units, 'highSpeed', d['ws']).value;
-			}));
+			})]);
 
 		var tempAxis = d3.svg.axis()
 			.scale(tempScale)
@@ -82,7 +82,8 @@ export default Ember.Component.extend({
 			.tickFormat(d3.format('d'));
 		var windAxis = d3.svg.axis()
 			.scale(windScale)
-			.orient('bottom');
+			.orient('bottom')
+			.ticks(4);
 
 		var line = d3.svg.line()
 			.x(function(d) {
