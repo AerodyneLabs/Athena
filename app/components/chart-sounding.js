@@ -28,9 +28,6 @@ export default Ember.Component.extend({
 		var height = this.get('h');
 		var data = this.get('data');
 		var units = this.get('units');
-		var altUnit = convert(units, 'altitude', 0).unit;
-		var tempUnit = convert(units, 'temperature', 0).unit;
-		var presUnit = convert(units, 'pressure', 0).unit;
 		var svg = d3.select('#'+this.get('elementId'));
 
 		var tempScale = d3.scale.linear()
@@ -71,27 +68,12 @@ export default Ember.Component.extend({
 
 		svg.select('.data').attr('d', line(data));
 		svg.select('.axis.temperature')
-			.call(tempAxis)
-			.select('text')
-			.attr('x', '0.5em')
-			.attr('dy', '-.5em')
-			.attr('text-anchor', 'start')
-			.text('Temperature (' + tempUnit + ')');
+			.call(tempAxis);
 		svg.select('.axis.altitude')
 			.attr('transform', 'translate(' + width + ',0)')
-			.call(altAxis)
-			.select('text')
-			.attr('transform', 'rotate(-90)')
-			.attr('dy', '-.5em')
-			.style('text-anchor', 'end')
-			.text('Altitude (' + altUnit + ')');
+			.call(altAxis);
 		svg.select('.axis.pressure')
-			.call(presAxis)
-			.select('text')
-			.attr('transform', 'rotate(-90)')
-			.attr('dy', '1em')
-			.style('text-anchor', 'end')
-			.text('Pressure (' + presUnit + ')');
+			.call(presAxis);
 	}.observes('units'),
 
 	didInsertElement: function() {

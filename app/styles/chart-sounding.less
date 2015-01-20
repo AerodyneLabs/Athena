@@ -1,0 +1,19 @@
+.axis > .axis-label {
+  text-anchor: end;
+}
+
+.axis.temperature > .axis-label {
+  text-anchor: start;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: @text-color;
+  shape-rendering: crispEdges;
+}
+
+path.data {
+  fill: none;
+  stroke: @brand-primary;
+  stroke-width: 2;
+}
