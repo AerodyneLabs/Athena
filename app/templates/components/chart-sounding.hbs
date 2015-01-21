@@ -2,18 +2,18 @@
 	<g class="temperature"  {{bind-attr transform=transformX}}>
 		<path class="data"></path>
 		<g class="axis">
-			<text class="axis-label" x=".5em" y="-.75em" dy=".35em">
+			<text class="axis-label" y="2em" dy=".35em" {{bind-attr x=tempLabel}}>
 				Temperature ({{units-unit units "temperature"}})
 			</text>
 		</g>
 	</g>
 	<g class="axis pressure">
-		<text class="axis-label" y=".75em" dy=".35em" transform="rotate(-90)">
+		<text class="axis-label" y=".75em" dy=".35em" transform="rotate(-90)" {{bind-attr x=verticalLabel}}>
 			Pressure ({{units-unit units "pressure"}})
 		</text>
 	</g>
 	<g class="axis altitude" {{bind-attr transform=transformAlt}}>
-		<text class="axis-label" y="-.75em" dy=".35em" transform="rotate(-90)">
+		<text class="axis-label" y="-.75em" dy=".35em" transform="rotate(-90)" {{bind-attr x=verticalLabel}}>
 			Altitude ({{units-unit units "altitude"}})
 		</text>
 	</g>
@@ -21,7 +21,7 @@
 		<path class="data"></path>
 		<g class="direction"></g>
 		<g class="axis">
-			<text class="axis-label" x=".5em" y="-.75em" dy=".35em">
+			<text class="axis-label" y="2em" dy=".35em" {{bind-attr x=windLabel}}>
 				Wind Speed ({{units-unit units "highSpeed"}})
 			</text>
 		</g>

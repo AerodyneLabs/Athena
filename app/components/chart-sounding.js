@@ -5,7 +5,7 @@ export default Ember.Component.extend({
 	tagName: 'svg',
 	attributeBindings: 'width height'.w(),
 
-	margin: {top: 20, right: 70, bottom: 30, left: 70},
+	margin: {top: 10, right: 80, bottom: 40, left: 80},
 	padding: 20,
 
 	w: function() {
@@ -23,6 +23,18 @@ export default Ember.Component.extend({
 	windWidth: function() {
 		return this.get('w') - this.get('tempWidth') - this.get('padding');
 	}.property('tempWidth'),
+
+	verticalLabel: function() {
+		return -(this.get('h') / 2.0);
+	}.property('h'),
+
+	tempLabel: function() {
+		return this.get('tempWidth') / 2.0;
+	}.property('tempWidth'),
+
+	windLabel: function() {
+		return this.get('windWidth') / 2.0;
+	}.property('windWidth'),
 
 	transformG: function() {
 		return "translate(" + this.get('margin.left') + "," + this.get('margin.top') + ")";
@@ -120,13 +132,21 @@ export default Ember.Component.extend({
 				var y = altScale(convert(units, 'altitude', d['h']).value) - height;
 				return 'translate(' + x + ',' + y + '), rotate(' + d['wd'] + ')';
 			})
-			.text('\uf0b1');
+			.text('\uf058');
 		svg.select('.temperature .axis')
 			.call(tempAxis);
-		svg.select('.axis.altitude')
-			.call(altAxis);
-		svg.select('.axis.pressure')
-			.call(presAxis);
+		var tempOffset = svg.select('.axis.altitude')
+			.call(altAxis)
+			.node()
+			.getBBox().width;
+		svg.select('.altitude .axis-label')
+			.attr('y', tempOffset - 10);
+		var presOffset = svg.select('.axis.pressure')
+			.call(presAxis)
+			.node()
+			.getBBox().width;
+		svg.select('.pressure .axis-label')
+			.attr('y', -(presOffset - 10));
 		svg.select('.wind .axis')
 			.call(windAxis);
 	}.observes('units'),
