@@ -49,6 +49,7 @@ export default Ember.Component.extend({
 	}.property('h'),
 
 	draw: function() {
+		var width = this.get('w');
 		var height = this.get('h');
 		var data = this.get('data');
 		var units = this.get('units');
@@ -83,22 +84,22 @@ export default Ember.Component.extend({
 			.orient('bottom')
 			.ticks(4);
 
+		var altitude = function(d) {
+			return altScale(convert(units, 'altitude', d['h']).value) - height;
+		};
+
 		var line = d3.svg.line()
 			.x(function(d) {
 				return tempScale(convert(units, 'temperature', d['t']).value);
 			})
-			.y(function(d) {
-				return altScale(convert(units, 'altitude', d['h']).value) - height;
-			})
+			.y(altitude)
 			.interpolate('linear');
 
 		var wind = d3.svg.line()
 			.x(function(d) {
 				return windScale(convert(units, 'highSpeed', d['ws']).value);
 			})
-			.y(function(d) {
-				return altScale(convert(units, 'altitude', d['h']).value) - height;
-			})
+			.y(altitude)
 			.interpolate('linear');
 
 		svg.select('.temperature > .data').attr('d', line(data));
@@ -113,8 +114,8 @@ export default Ember.Component.extend({
 			.attr('font-family', 'weathericons')
 			.attr('dy', '.35em')
 			.attr('transform', function(d) {
-				var x = windScale(convert(units, 'highSpeed', d['ws']).value) - 10;
-				var y = altScale(convert(units, 'altitude', d['h']).value) - height;
+				var x = windScale(convert(units, 'highSpeed', d['ws']).value);
+				var y = altitude(d);
 				return 'translate(' + x + ',' + y + '), rotate(' + d['wd'] + ')';
 			})
 			.text('\uf058');
@@ -128,6 +129,21 @@ export default Ember.Component.extend({
 			.attr('y', -(tempOffset - 10));
 		svg.select('.wind .axis')
 			.call(windAxis);
+		svg.select('.grid')
+			.selectAll('line.horizontalGrid')
+			.data(altScale.ticks())
+			.enter()
+			.append('line')
+			.attr('class', 'horizontalGrid')
+			.attr('x1', 0)
+			.attr('x2', width)
+			.attr('y1', function(d) {
+				return altScale(d);
+			})
+			.attr('y2', function(d) {
+				return altScale(d);
+			});
+
 	}.observes('units'),
 
 	didInsertElement: function() {
