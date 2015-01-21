@@ -129,12 +129,13 @@ export default Ember.Component.extend({
 			.attr('y', -(tempOffset - 10));
 		svg.select('.wind .axis')
 			.call(windAxis);
-		svg.select('.grid')
-			.selectAll('line.horizontalGrid')
+		var grid = svg.select('.grid');
+		grid.select('.altitude')
+			.selectAll('line.altGrid')
 			.data(altScale.ticks())
 			.enter()
 			.append('line')
-			.attr('class', 'horizontalGrid')
+			.attr('class', 'altGrid')
 			.attr('x1', 0)
 			.attr('x2', width)
 			.attr('y1', function(d) {
@@ -142,6 +143,34 @@ export default Ember.Component.extend({
 			})
 			.attr('y2', function(d) {
 				return altScale(d);
+			});
+		grid.select('.temperature')
+			.selectAll('line.tempGrid')
+			.data(tempScale.ticks(5))
+			.enter()
+			.append('line')
+			.attr('class', 'altGrid')
+			.attr('y1', 0)
+			.attr('y2', height)
+			.attr('x1', function(d) {
+				return tempScale(d);
+			})
+			.attr('x2', function(d) {
+				return tempScale(d);
+			});
+		grid.select('.wind')
+			.selectAll('line.windGrid')
+			.data(windScale.ticks(3))
+			.enter()
+			.append('line')
+			.attr('class', 'windGrid')
+			.attr('y1', 0)
+			.attr('y2', -height)
+			.attr('x1', function(d) {
+				return windScale(d);
+			})
+			.attr('x2', function(d) {
+				return windScale(d);
 			});
 
 	}.observes('units'),
