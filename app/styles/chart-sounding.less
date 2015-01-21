@@ -1,15 +1,19 @@
 .axis > .axis-label {
-  text-anchor: end;
+  text-anchor: middle;
 }
 
-.wind .axis-label,
-.temperature .axis-label {
-  text-anchor: start;
+.grid line {
+  fill: none;
+  stroke: @text-color;
+  stroke-Width: 1;
+  shape-rendering: crispEdges;
+  opacity: 0.25;
 }
 
 .wind .direction {
   text-anchor: middle;
   font-family: 'weathericons';
+  font-size: 1.5em;
 }
 
 .axis path, .axis line {
