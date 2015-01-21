@@ -1,4 +1,9 @@
 <g {{bind-attr transform=transformG}}>
+	<g class="grid">
+		<g class="altitude"></g>
+		<g class="temperature"></g>
+		<g class="wind" {{bind-attr transform=transformWind}}></g>
+	</g>
 	<g class="temperature"  {{bind-attr transform=transformX}}>
 		<path class="data"></path>
 		<g class="axis">
@@ -21,9 +26,9 @@
 			</text>
 		</g>
 	</g>
-	<g class="grid">
-		<g class="altitude"></g>
-		<g class="temperature"></g>
-		<g class="wind" {{bind-attr transform=transformWind}}></g>
+	<g class="focus">
+		<line y1="0" y2="0" x1="0" {{bind-attr x2=w}}></line>
+		<text dy=".35em" y="-0.75em">Altitude, Temperature, Pressure</text>
 	</g>
+	<rect class="overlay" {{bind-attr width=w}} {{bind-attr height=h}}></rect>
 </g>
