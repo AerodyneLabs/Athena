@@ -5,7 +5,7 @@ export default Ember.Component.extend({
 	tagName: 'svg',
 	attributeBindings: 'width height'.w(),
 
-	margin: {top: 10, right: 20, bottom: 40, left: 80},
+	margin: {top: 20, right: 20, bottom: 40, left: 80},
 	padding: 20,
 
 	w: function() {
@@ -131,11 +131,10 @@ export default Ember.Component.extend({
 			.call(windAxis);
 		var grid = svg.select('.grid');
 		grid.select('.altitude')
-			.selectAll('line.altGrid')
+			.selectAll('line')
 			.data(altScale.ticks())
 			.enter()
 			.append('line')
-			.attr('class', 'altGrid')
 			.attr('x1', 0)
 			.attr('x2', width)
 			.attr('y1', function(d) {
@@ -145,11 +144,10 @@ export default Ember.Component.extend({
 				return altScale(d);
 			});
 		grid.select('.temperature')
-			.selectAll('line.tempGrid')
+			.selectAll('line')
 			.data(tempScale.ticks(5))
 			.enter()
 			.append('line')
-			.attr('class', 'altGrid')
 			.attr('y1', 0)
 			.attr('y2', height)
 			.attr('x1', function(d) {
@@ -159,11 +157,10 @@ export default Ember.Component.extend({
 				return tempScale(d);
 			});
 		grid.select('.wind')
-			.selectAll('line.windGrid')
+			.selectAll('line')
 			.data(windScale.ticks(3))
 			.enter()
 			.append('line')
-			.attr('class', 'windGrid')
 			.attr('y1', 0)
 			.attr('y2', -height)
 			.attr('x1', function(d) {
@@ -173,6 +170,41 @@ export default Ember.Component.extend({
 				return windScale(d);
 			});
 
+		var bisectAlt = d3.bisector(function(a, b) {
+			return b - convert(units, 'altitude', a['h']).value;
+		}).left;
+
+		var focus = svg.select('.focus')
+			.style('display', 'none');
+
+		svg.select('rect.overlay')
+			.on('mouseover', function() {
+				focus.style('display', null);
+			})
+			.on('mouseout', function() {
+				focus.style('display', 'none');
+			})
+			.on('mousemove', mousemove);
+
+		function mousemove() {
+			var y0 = altScale.invert(d3.mouse(this)[1]);
+			var i = bisectAlt(data, y0, 1);
+			var d0 = data[i -1];
+			var d1 = data[i];
+			var d = y0 - d0['h'] < d1['h'] - y0 ? d1 : d0;
+			var y = altitude(d);
+			focus.attr('transform', 'translate(0,' + (y + height) + ')');
+			var altRes = convert(units, 'altitude', d['h']);
+			var tempRes = convert(units, 'temperature', d['t']);
+			var presRes = convert(units, 'pressure', d['p']);
+			var windRes = convert(units, 'highSpeed', d['ws']);
+			var alt = altRes.value + ' ' + altRes.unit;
+			var temp = tempRes.value + ' ' + tempRes.unit;
+			var pres = presRes.value + ' ' + presRes.unit;
+			var wind = windRes.value + ' ' + windRes.unit;
+			focus.select('text')
+				.text(alt + ' ' + temp + ' ' + pres + ' ' + wind);
+		}
 	}.observes('units'),
 
 	didInsertElement: function() {
