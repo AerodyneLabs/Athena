@@ -5,7 +5,7 @@ export default Ember.Component.extend({
 	tagName: 'svg',
 	attributeBindings: 'width height'.w(),
 
-	margin: {top: 10, right: 80, bottom: 40, left: 80},
+	margin: {top: 10, right: 20, bottom: 40, left: 80},
 	padding: 20,
 
 	w: function() {
@@ -48,10 +48,6 @@ export default Ember.Component.extend({
 		return "translate(" + (this.get('tempWidth') + this.get('padding')) + "," + this.get('h') + ")";
 	}.property('h'),
 
-	transformAlt: function() {
-		return "translate(" + this.get('w') + ",0)";
-	}.property('width'),
-
 	draw: function() {
 		var height = this.get('h');
 		var data = this.get('data');
@@ -70,11 +66,6 @@ export default Ember.Component.extend({
 			.domain(d3.extent(data, function(d) {
 				return convert(units, 'altitude', d['h']).value;
 			}));
-		var presScale = d3.scale.log()
-			.range([0, height])
-			.domain(d3.extent(data, function(d) {
-				return convert(units, 'pressure', d['p']).value;
-			}));
 		var windScale = d3.scale.linear()
 			.range([0, windWidth])
 			.domain([0, d3.max(data, function(d) {
@@ -86,13 +77,7 @@ export default Ember.Component.extend({
 			.orient('bottom');
 		var altAxis = d3.svg.axis()
 			.scale(altScale)
-			.orient('right');
-		var presAxis = d3.svg.axis()
-			.scale(presScale)
-			.orient('left')
-			.tickFormat(function(d) {
-				return presScale.tickFormat(10, d3.format(',d'))(d);
-			});
+			.orient('left');
 		var windAxis = d3.svg.axis()
 			.scale(windScale)
 			.orient('bottom')
@@ -140,13 +125,7 @@ export default Ember.Component.extend({
 			.node()
 			.getBBox().width;
 		svg.select('.altitude .axis-label')
-			.attr('y', tempOffset - 10);
-		var presOffset = svg.select('.axis.pressure')
-			.call(presAxis)
-			.node()
-			.getBBox().width;
-		svg.select('.pressure .axis-label')
-			.attr('y', -(presOffset - 10));
+			.attr('y', -(tempOffset - 10));
 		svg.select('.wind .axis')
 			.call(windAxis);
 	}.observes('units'),
