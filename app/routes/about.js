@@ -1,4 +1,8 @@
 import Ember from 'ember';
 
-export default Ember.Route.extend({
-});
+/**
+ * The about page route
+ * @class AboutRoute
+ * @extends Ember.Route
+ */
+export default Ember.Route.extend({});

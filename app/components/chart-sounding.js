@@ -1,53 +1,139 @@
 import Ember from 'ember';
 import convert from 'athena/helpers/units';
 
+/**
+ * A component to display a sounding chart
+ * @class ChartSoundingComponent
+ * @extends Ember.Component
+ */
 export default Ember.Component.extend({
+	/**
+	 * Use an svg tag to enclose the component
+	 * @property tagName
+	 * @type String
+	 */
 	tagName: 'svg',
+
+	/**
+	 * Attributes to bind on the component
+	 * @property attributeBindings
+	 * @type String
+	 */
 	attributeBindings: 'width height'.w(),
 
-	margin: {top: 20, right: 20, bottom: 40, left: 80},
+	/**
+	 * Margin measurements for the chart area
+	 * @property margin
+	 * @type Object
+	 */
+	margin: {
+		top: 20,
+		right: 20,
+		bottom: 40,
+		left: 80
+	},
+
+	/**
+	 * Padding between the temperature and wind charts
+	 * @property padding
+	 * @type Number
+	 */
 	padding: 20,
 
+	/**
+	 * Computed width of the chart area
+	 * @property w
+	 * @type Number
+	 */
 	w: function() {
 		return this.get('width') - this.get('margin.left') - this.get('margin.right');
 	}.property('width'),
 
+	/**
+	 * Computed height of the chart area
+	 * @property h
+	 * @type Number
+	 */
 	h: function() {
 		return this.get('height') - this.get('margin.top') - this.get('margin.bottom');
 	}.property('height'),
 
+	/**
+	 * Computed width of the temperature chart
+	 * @property tempWidth
+	 * @type Number
+	 */
 	tempWidth: function() {
 		return Math.round(0.7 * (this.get('w') - this.get('padding')));
 	}.property('width'),
 
+	/**
+	 * Computed width of the wind chart
+	 * @property windWidth
+	 * @type Number
+	 */
 	windWidth: function() {
 		return this.get('w') - this.get('tempWidth') - this.get('padding');
 	}.property('tempWidth'),
 
+	/**
+	 * Computed offset height for vertical axis labels
+	 * @property verticalLabel
+	 * @type Number
+	 */
 	verticalLabel: function() {
 		return -(this.get('h') / 2.0);
 	}.property('h'),
 
+	/**
+	 * Computed offset of the temperature axis label
+	 * @property tempLabel
+	 * @type Number
+	 */
 	tempLabel: function() {
 		return this.get('tempWidth') / 2.0;
 	}.property('tempWidth'),
 
+	/**
+	 * Computed offset of the wind axis label
+	 * @property windLabel
+	 * @type Number
+	 */
 	windLabel: function() {
 		return this.get('windWidth') / 2.0;
 	}.property('windWidth'),
 
+	/**
+	 * Computed transform for the chart context
+	 * @property transformG
+	 * @type String
+	 */
 	transformG: function() {
 		return "translate(" + this.get('margin.left') + "," + this.get('margin.top') + ")";
 	}.property(),
 
+	/**
+	 * Computed transform for the temperature axis
+	 * @property transformX
+	 * @type String
+	 */
 	transformX: function() {
-		return "translate(0,"+ this.get('h') +")";
+		return "translate(0," + this.get('h') + ")";
 	}.property('h'),
 
+	/**
+	 * Computed transform for the wind axis
+	 * @property transformWind
+	 * @type String
+	 */
 	transformWind: function() {
 		return "translate(" + (this.get('tempWidth') + this.get('padding')) + "," + this.get('h') + ")";
 	}.property('h'),
 
+	/**
+	 * Draw the chart
+	 * @method draw
+	 */
 	draw: function() {
 		var width = this.get('w');
 		var height = this.get('h');
@@ -55,7 +141,7 @@ export default Ember.Component.extend({
 		var units = this.get('units');
 		var tempWidth = this.get('tempWidth');
 		var windWidth = this.get('windWidth');
-		var svg = d3.select('#'+this.get('elementId'));
+		var svg = d3.select('#' + this.get('elementId'));
 
 		var tempScale = d3.scale.linear()
 			.range([0, tempWidth])
@@ -189,7 +275,7 @@ export default Ember.Component.extend({
 		function mousemove() {
 			var y0 = altScale.invert(d3.mouse(this)[1]);
 			var i = bisectAlt(data, y0, 1);
-			var d0 = data[i -1];
+			var d0 = data[i - 1];
 			var d1 = data[i];
 			var d = y0 - d0['h'] < d1['h'] - y0 ? d1 : d0;
 			var y = altitude(d);
@@ -207,6 +293,10 @@ export default Ember.Component.extend({
 		}
 	}.observes('units'),
 
+	/**
+	 * Element insertion callback, trigger redraw
+	 * @method didInsertElement
+	 */
 	didInsertElement: function() {
 		this.draw();
 	}
