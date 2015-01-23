@@ -1,16 +1,27 @@
 import DS from 'ember-data';
 import Ember from 'ember';
 
+/**
+ * Transform a geographic location between the data store and backend
+ * @class PointTransform
+ * @extends DS.Transform
+ */
 export default DS.Transform.extend({
-  serialize: function(value) {
+  /**
+   * Serialize an Ember model point attribute as a GeoJSON point
+   * @method serialized
+   * @param deserialized {Point} Ember model point attribute to be serialized
+   * @return {JSON} GeoJSON serialized point
+   */
+  serialize: function(deserialized) {
 		var ser = {
 			type: 'Point',
 			coordinates: [
-				value.get('longitude'), value.get('latitude')
+				deserialized.get('longitude'), deserialized.get('latitude')
 			]
 		};
-		var alt = value.get('altitude');
-		var ts = value.get('time');
+		var alt = deserialized.get('altitude');
+		var ts = deserialized.get('time');
 		if(isNaN(alt) === false) {
 			ser['coordinates'].push(alt);
 			if(isNaN(ts) === false) {
@@ -20,11 +31,17 @@ export default DS.Transform.extend({
 		return ser;
   },
 
-  deserialize: function(value) {
-		var lon = value['coordinates'][0];
-		var lat = value['coordinates'][1];
-		var alt = value['coordinates'][2] || NaN;
-		var ts = value['coordinates'][3] || NaN;
+  /**
+   * Deserialize a GeoJSON point as an Ember model point attribute
+   * @method deserialize
+   * @param serialized {JSON} GeoJSON serialized point
+   * @return {Point} Ember model point attrbute
+   */
+  deserialize: function(serialized) {
+		var lon = serialized['coordinates'][0];
+		var lat = serialized['coordinates'][1];
+		var alt = serialized['coordinates'][2] || NaN;
+		var ts = serialized['coordinates'][3] || NaN;
     return Ember.create({
 			longitude: lon, latitude: lat, altitude: alt, time: ts
 		});

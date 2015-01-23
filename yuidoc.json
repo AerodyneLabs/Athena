@@ -1,0 +1,12 @@
+{
+  "name": "athena",
+  "description": "Online high altitude ballooning portal",
+  "version": "0.0.1",
+  "options": {
+    "paths": [
+      "app"
+    ],
+    "exclude": "vendor",
+    "outdir": "docs"
+  }
+}
