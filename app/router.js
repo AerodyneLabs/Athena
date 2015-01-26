@@ -18,8 +18,6 @@ Router.map(function() {
   this.route("sounding", {
     path: "/sounding/:id"
   });
-
-  this.route("login");
 });
 
 export default Router;
