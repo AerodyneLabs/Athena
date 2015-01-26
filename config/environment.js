@@ -20,8 +20,9 @@ module.exports = function(environment) {
 
     torii: {
       providers: {
-        'google-oauth2': {
+        'google-token': {
           apiKey: '258622071393-fpp3cbbf5385nm3u90a3hc563p8do5tj.apps.googleusercontent.com',
+          scope: 'profile email',
           redirectUri: 'http://localhost:4200'
         }
       }

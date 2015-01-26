@@ -7,7 +7,7 @@ export default Ember.Controller.extend(LoginControllerMixin, {
     loginWithGoogle: function() {
       var _this = this;
       this.get('session')
-        .authenticate('simple-auth-authenticator:torii', 'google-oauth2')
+        .authenticate('simple-auth-authenticator:torii', 'google-token')
         .then(function() {
           console.log('Authorized: ', _this.get('session.content'));
         }, function(error) {
