@@ -19,7 +19,8 @@ module.exports = function(environment) {
     },
 
     'simple-auth': {
-      authorizer: 'authorizer:custom'
+      authorizer: 'authorizer:custom',
+      store: 'simple-auth-session-store:local-storage'
     },
 
     torii: {
