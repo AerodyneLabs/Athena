@@ -9,12 +9,7 @@ export default Ember.Controller.extend(LoginControllerMixin, {
       this.get('session')
         .authenticate('simple-auth-authenticator:torii', 'google-oauth2')
         .then(function() {
-          var authCode = _this.get('session.authorizationCode');
           console.log('Authorized: ', _this.get('session.content'));
-          $.get('https://www.googleapis.com/plus/v1/people/me', {access_token: authCode})
-            .then(function(user) {
-              console.log(user);
-            });
         }, function(error) {
           console.log('Error: ', error);
         });
