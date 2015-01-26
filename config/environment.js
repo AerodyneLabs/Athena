@@ -18,6 +18,10 @@ module.exports = function(environment) {
       // when it is created
     },
 
+    'simple-auth': {
+      authorizer: 'authorizer:custom'
+    },
+
     torii: {
       providers: {
         'google-token': {
