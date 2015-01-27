@@ -16,6 +16,21 @@ module.exports = function(environment) {
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
+    },
+
+    'simple-auth': {
+      authorizer: 'authorizer:custom',
+      store: 'simple-auth-session-store:local-storage'
+    },
+
+    torii: {
+      providers: {
+        'google-token': {
+          apiKey: '258622071393-fpp3cbbf5385nm3u90a3hc563p8do5tj.apps.googleusercontent.com',
+          scope: 'profile email',
+          redirectUri: 'http://beta.aerodynelabs.com'
+        }
+      }
     }
   };
 
@@ -25,6 +40,7 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
+    ENV.torii.providers['google-token'].redirectUri = 'http://localhost:4200';
   }
 
   if (environment === 'test') {
