@@ -40,6 +40,26 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 	});
 });
 
+server.get('api/centers', function(req, res, next) {
+	var store = airspace.get('artcc');
+	store.find({}, function(err, docs) {
+		if(err) return next(err);
+
+		res.send({'centers': docs});
+		return next();
+	});
+});
+
+server.get('api/centers/:id', function(req, res, next) {
+	var store = airspace.get('artcc');
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'center': doc});
+		return next();
+	});
+});
+
 server.get('api/soundings', function(req, res, next) {
 	var store = monk.get('forecast');
 	store.find({}, function(err, docs) {
