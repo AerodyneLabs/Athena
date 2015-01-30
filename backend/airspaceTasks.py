@@ -221,7 +221,9 @@ def process_artcc(self):
 
 
 @app.task(base=MongoTask, bind=True)
-def process_nav_file(self, filename):
+def process_nav_file(self):
+    # Download latest file
+    filename = download_latest_file('NAV.zip')
     # Open input zip file
     zf = ZipFile(filename)
     # Open the contained file
@@ -282,7 +284,9 @@ def process_nav_file(self, filename):
 
 
 @app.task(base=MongoTask, bind=True)
-def process_airspace_file(self, filename):
+def process_airspace_file(self):
+    # Download latest file
+    filename = download_latest_file('class_airspace_shape_files.zip')
     # Open input zip file
     zf = ZipFile(filename)
     # Open the database
