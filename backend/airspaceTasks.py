@@ -31,6 +31,27 @@ nav_fields = {
     'epoch': RecordField(485, 4, 'r'),
     'status': RecordField(767, 30, 'l'),
 }
+aff_fields = {
+    'record_type': RecordField(1, 4, 'l'),
+    'facility_id': RecordField(5, 4, 'l'),
+    'name': RecordField(9, 40, 'l'),
+    'location': RecordField(49, 30, 'l'),
+    'facility_type': RecordField(129, 5, 'l'),
+    'state_name': RecordField(144, 30, 'l'),
+    'state_code': RecordField(174, 2, 'l'),
+    'latitude': RecordField(176, 14, 'l'),
+    'longitude': RecordField(201, 14, 'l')
+}
+arb_fields = {
+    'record_id': RecordField(1, 12, 'l'),
+    'center_name': RecordField(13, 40, 'l'),
+    'structure': RecordField(53, 10, 'l'),
+    'latitude': RecordField(63, 14, 'l'),
+    'longitude': RecordField(77, 14, 'l'),
+    'description': RecordField(91, 300, 'l'),
+    'seq_num': RecordField(391, 6, 'l'),
+    'nas': RecordField(397, 1, 'l')
+}
 nav_filter = ['VOR/DME', 'VORTAC']
 airspace_files = {
     'Shape_Files/class_b': 'Class B',
