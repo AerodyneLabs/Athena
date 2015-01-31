@@ -6,7 +6,8 @@ from collections import namedtuple
 from datetime import datetime
 from os import remove
 from shapefile import Reader
-from geojson import Feature, Point, Polygon
+import json
+import geojson
 from worker import app
 from mongoTask import MongoTask
 
@@ -166,11 +167,11 @@ def process_artcc(self):
                 state = get_field(line, aff_fields['state_code'])
                 lat = parse_dms(get_field(line, aff_fields['latitude']))
                 lon = parse_dms(get_field(line, aff_fields['longitude']))
-                data[facility_id] = Feature(properties={
+                data[facility_id] = geojson.Feature(properties={
                     'name': facility_name,
                     'city': location,
                     'state': state,
-                    'loc': Point([lon, lat])
+                    'loc': geojson.Point([lon, lat])
                 }, id=facility_id)
     # Clean up facility file
     zf.close()
@@ -194,7 +195,7 @@ def process_artcc(self):
             if cur_facility != '':
                 if cur_alt == 'HIGH':
                     cur_points.append(cur_points[0])
-                    poly = Polygon([cur_points])
+                    poly = geojson.Polygon([cur_points])
                     data[cur_facility]['geometry'] = poly
             cur_facility = facility_id
             cur_alt = rec_alt
@@ -214,8 +215,10 @@ def process_artcc(self):
         rec = data[id]
         if rec.geometry:
             count += 1
+            record = json.loads(geojson.dumps(rec))
+            record['_id'] = record.pop('id')
             store.update(
-                {'id': rec.id}, {'$set': rec}, upsert=True)
+                {'_id': rec.id}, {'$set': record}, upsert=True)
     # Return meaningful result
     return count
 
@@ -258,14 +261,14 @@ def process_nav_file(self):
                         line, nav_fields['latitude']))
                     lon = parse_dms(get_field(
                         line, nav_fields['longitude']))
-                    point = Point((lon, lat))
+                    point = geojson.Point((lon, lat))
                     properties['elevation'] = float(get_field(
                         line, nav_fields['elevation']))
                     properties['variation'] = parse_variation(get_field(
                         line, nav_fields['variation']))
                     properties['status'] = get_field(
                         line, nav_fields['status'])
-                    navaid = Feature(
+                    navaid = geojson.Feature(
                         geometry=point, properties=properties, id=id)
                     store.update(
                         {'id': id}, {'$set': navaid}, upsert=True)
@@ -312,14 +315,14 @@ def process_airspace_file(self):
                     pass
             hiAlt = float(sr.record[3])
             bbox = sr.shape.bbox
-            bounds = Polygon([[
+            bounds = geojson.Polygon([[
                 (bbox[0], bbox[1]),
                 (bbox[2], bbox[1]),
                 (bbox[2], bbox[3]),
                 (bbox[0], bbox[3]),
                 (bbox[0], bbox[1])
             ]])
-            feature = Feature(
+            feature = geojson.Feature(
                 geometry=sr.shape,
                 id=id,
                 properties={
