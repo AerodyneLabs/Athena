@@ -52,6 +52,7 @@ server.get('api/centers', function(req, res, next) {
 
 server.get('api/centers/:id', function(req, res, next) {
 	var store = airspace.get('artcc');
+	store.id = function(str) {return str;};
 	store.findById(req.params.id, function(err, doc) {
 		if(err) return next(err);
 
