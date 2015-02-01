@@ -6,7 +6,8 @@ from collections import namedtuple
 from datetime import datetime
 from os import remove
 from shapefile import Reader
-from geojson import Feature, Point, Polygon
+import json
+import geojson
 from worker import app
 from mongoTask import MongoTask
 
@@ -30,6 +31,27 @@ nav_fields = {
     'variation': RecordField(480, 5, 'r'),
     'epoch': RecordField(485, 4, 'r'),
     'status': RecordField(767, 30, 'l'),
+}
+aff_fields = {
+    'record_type': RecordField(1, 4, 'l'),
+    'facility_id': RecordField(5, 4, 'l'),
+    'name': RecordField(9, 40, 'l'),
+    'location': RecordField(49, 30, 'l'),
+    'facility_type': RecordField(129, 5, 'l'),
+    'state_name': RecordField(144, 30, 'l'),
+    'state_code': RecordField(174, 2, 'l'),
+    'latitude': RecordField(176, 14, 'l'),
+    'longitude': RecordField(201, 14, 'l')
+}
+arb_fields = {
+    'record_id': RecordField(1, 12, 'l'),
+    'center_name': RecordField(13, 40, 'l'),
+    'structure': RecordField(53, 10, 'l'),
+    'latitude': RecordField(63, 14, 'l'),
+    'longitude': RecordField(77, 14, 'l'),
+    'description': RecordField(91, 300, 'l'),
+    'seq_num': RecordField(391, 6, 'l'),
+    'nas': RecordField(397, 1, 'l')
 }
 nav_filter = ['VOR/DME', 'VORTAC']
 airspace_files = {
@@ -106,8 +128,7 @@ def get_latest_url(filename):
     return prefix + folder + filename
 
 
-@app.task(bind=True)
-def download_latest_file(self, filename):
+def download_latest_file(filename):
     # Get file url
     url = get_latest_url(filename)
     filename = url.split('/')[-1]
@@ -120,16 +141,92 @@ def download_latest_file(self, filename):
             for chunk in request.iter_content(2**18):
                 file.write(chunk)
                 cur_length += len(chunk)
-                self.update_state(
-                    state='DOWNLOADING',
-                    meta={'current': cur_length, 'total': total_length}
-                )
     # Return filename
     return TEMP_DIR + filename
 
 
 @app.task(base=MongoTask, bind=True)
-def process_nav_file(self, filename):
+def process_artcc(self):
+    # Create data array
+    data = {}
+
+    # Download facility file
+    aff_fn = download_latest_file('AFF.zip')
+    # Open facility file
+    zf = ZipFile(aff_fn)
+    aff_file = zf.open('AFF.txt')
+    # Process facility file
+    for line in aff_file:
+        line_type = get_field(line, aff_fields['record_type'])
+        if line_type == 'AFF1':
+            facility_type = get_field(line, aff_fields['facility_type'])
+            if facility_type == 'ARTCC':
+                facility_id = get_field(line, aff_fields['facility_id'])
+                facility_name = get_field(line, aff_fields['name'])
+                location = get_field(line, aff_fields['location'])
+                state = get_field(line, aff_fields['state_code'])
+                lat = parse_dms(get_field(line, aff_fields['latitude']))
+                lon = parse_dms(get_field(line, aff_fields['longitude']))
+                data[facility_id] = geojson.Feature(properties={
+                    'name': facility_name,
+                    'city': location,
+                    'state': state,
+                    'loc': geojson.Point([lon, lat])
+                }, id=facility_id)
+    # Clean up facility file
+    zf.close()
+    remove(aff_fn)
+
+    # Download boundary file
+    arb_fn = download_latest_file('ARB.zip')
+    # Open boundary file
+    zf = ZipFile(arb_fn)
+    arb_file = zf.open('ARB.txt')
+    # Process boundary file
+    cur_facility = ''
+    cur_alt = ''
+    cur_points = []
+    poly = None
+    for line in arb_file:
+        rec_id = get_field(line, arb_fields['record_id'])
+        facility_id = rec_id.split(' ')[0]
+        rec_alt = get_field(line, arb_fields['structure'])
+        if cur_facility != facility_id or cur_alt != rec_alt:
+            if cur_facility != '':
+                if cur_alt == 'HIGH':
+                    cur_points.append(cur_points[0])
+                    poly = geojson.Polygon([cur_points])
+                    data[cur_facility]['geometry'] = poly
+            cur_facility = facility_id
+            cur_alt = rec_alt
+            cur_points = []
+        lat = parse_dms(get_field(line, arb_fields['latitude']))
+        lon = parse_dms(get_field(line, arb_fields['longitude']))
+        cur_points.append((lon, lat))
+    #Clean up boundary file
+    zf.close()
+    remove(arb_fn)
+
+    # Open database collection
+    store = process_artcc.mongo.airspace.artcc
+    # Iterate over data
+    count = 0
+    for id in data:
+        rec = data[id]
+        if rec.geometry:
+            count += 1
+            record = json.loads(geojson.dumps(rec))
+            record['_id'] = record.pop('id')
+            store.update(
+                {'_id': rec.id}, {'$set': record}, upsert=True)
+    # Return meaningful result
+    return count
+
+
+@app.task(base=MongoTask, bind=True)
+def process_nav_file(self):
+    # Download latest file
+    filename = download_latest_file('NAV.zip')
     # Open input zip file
     zf = ZipFile(filename)
     # Open the contained file
@@ -164,14 +261,14 @@ def process_nav_file(self, filename):
                         line, nav_fields['latitude']))
                     lon = parse_dms(get_field(
                         line, nav_fields['longitude']))
-                    point = Point((lon, lat))
+                    point = geojson.Point((lon, lat))
                     properties['elevation'] = float(get_field(
                         line, nav_fields['elevation']))
                     properties['variation'] = parse_variation(get_field(
                         line, nav_fields['variation']))
                     properties['status'] = get_field(
                         line, nav_fields['status'])
-                    navaid = Feature(
+                    navaid = geojson.Feature(
                         geometry=point, properties=properties, id=id)
                     store.update(
                         {'id': id}, {'$set': navaid}, upsert=True)
@@ -190,7 +287,9 @@ def process_nav_file(self, filename):
 
 
 @app.task(base=MongoTask, bind=True)
-def process_airspace_file(self, filename):
+def process_airspace_file(self):
+    # Download latest file
+    filename = download_latest_file('class_airspace_shape_files.zip')
     # Open input zip file
     zf = ZipFile(filename)
     # Open the database
@@ -216,14 +315,14 @@ def process_airspace_file(self, filename):
                     pass
             hiAlt = float(sr.record[3])
             bbox = sr.shape.bbox
-            bounds = Polygon([[
+            bounds = geojson.Polygon([[
                 (bbox[0], bbox[1]),
                 (bbox[2], bbox[1]),
                 (bbox[2], bbox[3]),
                 (bbox[0], bbox[3]),
                 (bbox[0], bbox[1])
             ]])
-            feature = Feature(
+            feature = geojson.Feature(
                 geometry=sr.shape,
                 id=id,
                 properties={

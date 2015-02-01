@@ -18,6 +18,11 @@ Router.map(function() {
   this.route("sounding", {
     path: "/sounding/:id"
   });
+
+  this.route("centers");
+  this.route("center", {
+    path: "/center/:id"
+  });
 });
 
 export default Router;
