@@ -1,0 +1,10 @@
+<h1>Air Route Traffic Control Centers</h1>
+<ul>
+  {{#each center in model}}
+    <li>
+      {{#link-to 'center' center.id}}
+        {{center.id}} - {{center.properties.name}}
+      {{/link-to}}
+    </li>
+  {{/each}}
+</ul>
