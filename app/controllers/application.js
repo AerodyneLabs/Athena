@@ -27,6 +27,8 @@ export default Ember.Controller.extend(LoginControllerMixin, {
 		name: 'Metric'
 	}],
 
+	time: new Date(),
+
 	authenticator: 'authenticator:torii',
 	actions: {
 		loginWithGoogle: function() {
