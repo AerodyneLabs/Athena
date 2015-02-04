@@ -40,6 +40,53 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 	});
 });
 
+server.get('api/towers', function(req, res, next) {
+	var store = airspace.get('tower');
+	var limit = req.query.limit || 25;
+	var skip = req.query.skip || 0;
+	var query = {};
+	if(req.query.near) {
+		var coords = JSON.parse(req.query.near);
+		query = {
+			geometry: {
+				$near: {
+					$geometry: {
+						type: 'Point',
+						coordinates: coords
+					}
+				}
+			}
+		};
+	}
+	if(req.query.within) {
+		var coords = JSON.parse(req.query.within);
+		query = {
+			geometry: {
+				$geoWithin: {
+					$box: coords
+				}
+			}
+		};
+	}
+	store.find(query, {limit: limit, skip: skip}, function(err, docs) {
+		if(err) return next(err);
+
+		res.send({'towers': docs});
+		return next();
+	});
+});
+
+server.get('api/towers/:id', function(req, res, next) {
+	var store = airspace.get('tower');
+	store.id = function(str) {return str;};
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'center': doc});
+		return next();
+	});
+});
+
 server.get('api/centers', function(req, res, next) {
 	var store = airspace.get('artcc');
 	store.find({}, function(err, docs) {
