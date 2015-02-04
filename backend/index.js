@@ -42,7 +42,23 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 
 server.get('api/towers', function(req, res, next) {
 	var store = airspace.get('tower');
-	store.find({}, function(err, docs) {
+	var limit = req.query.limit || 25;
+	var skip = req.query.skip || 0;
+	var query = {};
+	if(req.query.near) {
+		var coords = JSON.parse(req.query.near);
+		query = {
+			geometry: {
+				$near: {
+					$geometry: {
+						type: 'Point',
+						coordinates: coords
+					}
+				}
+			}
+		};
+	}
+	store.find(query, {limit: limit, skip: skip}, function(err, docs) {
 		if(err) return next(err);
 
 		res.send({'towers': docs});
