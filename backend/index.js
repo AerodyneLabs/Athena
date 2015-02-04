@@ -58,6 +58,16 @@ server.get('api/towers', function(req, res, next) {
 			}
 		};
 	}
+	if(req.query.within) {
+		var coords = JSON.parse(req.query.within);
+		query = {
+			geometry: {
+				$geoWithin: {
+					$box: coords
+				}
+			}
+		};
+	}
 	store.find(query, {limit: limit, skip: skip}, function(err, docs) {
 		if(err) return next(err);
 
