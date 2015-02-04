@@ -40,6 +40,27 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 	});
 });
 
+server.get('api/towers', function(req, res, next) {
+	var store = airspace.get('tower');
+	store.find({}, function(err, docs) {
+		if(err) return next(err);
+
+		res.send({'towers': docs});
+		return next();
+	});
+});
+
+server.get('api/towers/:id', function(req, res, next) {
+	var store = airspace.get('tower');
+	store.id = function(str) {return str;};
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'center': doc});
+		return next();
+	});
+});
+
 server.get('api/centers', function(req, res, next) {
 	var store = airspace.get('artcc');
 	store.find({}, function(err, docs) {
