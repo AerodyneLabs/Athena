@@ -89,7 +89,41 @@ server.get('api/towers/:id', function(req, res, next) {
 
 server.get('api/centers', function(req, res, next) {
 	var store = airspace.get('artcc');
-	store.find({}, function(err, docs) {
+	var query = {};
+	if(req.query.near) {
+		var coords = JSON.parse(req.query.near);
+		query = {
+			geometry: {
+				$geoIntersects: {
+					$geometry: {
+						type: 'Point',
+						coordinates: coords
+					}
+				}
+			}
+		};
+	}
+	if(req.query.within) {
+		var coords = JSON.parse(req.query.within);
+		var box = [
+		  coords[0],
+		  [coords[1][0], coords[0][1]],
+		  coords[1],
+		  [coords[0][0], coords[1][1]],
+			coords[0]
+		];
+		query = {
+			geometry: {
+				$geoIntersects: {
+					$geometry: {
+						type: 'Polygon',
+						coordinates: [box]
+					}
+				}
+			}
+		};
+	}
+	store.find(query, function(err, docs) {
 		if(err) return next(err);
 
 		res.send({'centers': docs});
