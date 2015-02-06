@@ -192,32 +192,50 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 	});
 });
 
-server.get('api/navaids/:latitude/:longitude', function(req, res, next) {
-	var lat = Number(req.params.latitude);
-	var lon = Number(req.params.longitude);
-	var store = airspace.get('navaids');
-	store.find({
-		'geometry': {
-			'$near': {
-				'$geometry': {
-					'type': 'Point',
-					'coordinates': [lon, lat]
+server.get('api/navaids', function(req, res, next) {
+	var store = airspace.get('navaid');
+	var limit = req.query.limit || 25;
+	var skip = req.query.skip || 0;
+	var query = {};
+	if(req.query.near) {
+		var coords = JSON.parse(req.query.near);
+		query = {
+			geometry: {
+				$near: {
+					$geometry: {
+						type: 'Point',
+						coordinates: coords
+					}
 				}
 			}
-		}
-	}, {
-		'limit': 10
-	}, function(err, docs) {
-		if(err) {
-			res.send(400, err);
-		} else {
-			var features = {
-				'type': 'FeatureCollection',
-				'features': docs
+		};
+	}
+	if(req.query.within) {
+		var coords = JSON.parse(req.query.within);
+		query = {
+			geometry: {
+				$geoWithin: {
+					$box: coords
+				}
 			}
-			res.send(features);
-		}
-		next()
+		};
+	}
+	store.find(query, {limit: limit, skip: skip}, function(err, docs) {
+		if(err) return next(err);
+
+		res.send({'navaids': docs});
+		return next();
+	});
+});
+
+server.get('api/navaids/:id', function(req, res, next) {
+	var store = airspace.get('navaid');
+	store.id = function(str) {return str;};
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'navaid': doc});
+		return next();
 	});
 });
 
