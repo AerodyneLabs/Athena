@@ -195,7 +195,7 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 server.get('api/navaids/:latitude/:longitude', function(req, res, next) {
 	var lat = Number(req.params.latitude);
 	var lon = Number(req.params.longitude);
-	var store = airspace.get('navaids');
+	var store = airspace.get('navaid');
 	store.find({
 		'geometry': {
 			'$near': {

@@ -316,7 +316,7 @@ def process_artcc(self):
 
 
 @app.task(base=MongoTask, bind=True)
-def process_nav_file(self):
+def process_nav(self):
     # Download latest file
     filename = download_latest_file('NAV.zip')
     # Open input zip file
@@ -324,7 +324,7 @@ def process_nav_file(self):
     # Open the contained file
     nav_file = zf.open('NAV.txt')
     # Open database collection
-    store = process_nav_file.mongo.airspace.navaids
+    store = process_nav.mongo.airspace.navaid
     # Iterate over the file
     count = 0
     for line in nav_file:
@@ -353,17 +353,19 @@ def process_nav_file(self):
                         line, nav_fields['latitude']))
                     lon = parse_dms(get_field(
                         line, nav_fields['longitude']))
-                    point = geojson.Point((lon, lat))
-                    properties['elevation'] = float(get_field(
+                    properties['elevation'] = 0.3048 * float(get_field(
                         line, nav_fields['elevation']))
+                    point = geojson.Point((lon, lat))
                     properties['variation'] = parse_variation(get_field(
                         line, nav_fields['variation']))
                     properties['status'] = get_field(
                         line, nav_fields['status'])
                     navaid = geojson.Feature(
                         geometry=point, properties=properties, id=id)
+                    record = navaid
+                    record['_id'] = record.pop('id')
                     store.update(
-                        {'id': id}, {'$set': navaid}, upsert=True)
+                        {'_id': id}, {'$set': record}, upsert=True)
                     count += 1
                     self.update_state(
                         state='PROCESSING',
