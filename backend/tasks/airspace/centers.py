@@ -1,4 +1,4 @@
-from helpers import *
+from helpers import download_latest_file, get_field, parse_dms, RecordField
 from worker import app
 from tasks.mongoTask import MongoTask
 from zipfile import ZipFile
@@ -89,7 +89,7 @@ def update_centers(self):
         lat = parse_dms(get_field(line, arb_fields['latitude']))
         lon = parse_dms(get_field(line, arb_fields['longitude']))
         cur_points.append((lon, lat))
-    #Clean up boundary file
+    # Clean up boundary file
     zf.close()
     remove(arb_fn)
 

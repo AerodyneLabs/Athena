@@ -81,6 +81,7 @@ def get_latest_url(filename):
 
 
 def download_latest_file(filename):
+    # FIXME status updating
     # Get file url
     url = get_latest_url(filename)
     filename = url.split('/')[-1]

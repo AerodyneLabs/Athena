@@ -1,4 +1,9 @@
-from helpers import *
+from helpers import (
+    download_latest_file,
+    get_field,
+    parse_dms,
+    RecordField
+)
 from worker import app
 from tasks.mongoTask import MongoTask
 from zipfile import ZipFile
@@ -66,11 +71,11 @@ def update_towers(self):
             if lat:
                 point = geojson.Point((lon, lat))
             properties = {
-                    'name': name,
-                    'type': facility_type,
-                    'region': region,
-                    'state': state,
-                    'city': city
+                'name': name,
+                'type': facility_type,
+                'region': region,
+                'state': state,
+                'city': city
             }
             if master_id is not '':
                 properties['master'] = {

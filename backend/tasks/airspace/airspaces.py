@@ -1,10 +1,10 @@
-from helpers import *
+from helpers import download_latest_file
 from worker import app
 from tasks.mongoTask import MongoTask
 from zipfile import ZipFile
 from shapefile import Reader
 import geojson
-from os import remove
+from os import dirname, remove
 
 
 airspace_files = {
@@ -18,6 +18,8 @@ airspace_files = {
 def update_airspaces(self):
     # Download latest file
     filename = download_latest_file('class_airspace_shape_files.zip')
+    # Construct temp dir
+    temp_dir = dirname(filename)
     # Open input zip file
     zf = ZipFile(filename)
     # Open the database
@@ -27,9 +29,9 @@ def update_airspaces(self):
     count = 0
     for airspace_name, airspace_class in airspace_files.iteritems():
         # Extract component files
-        shp_fn = zf.extract(airspace_name + '.shp', TEMP_DIR)
-        shx_fn = zf.extract(airspace_name + '.shx', TEMP_DIR)
-        dbf_fn = zf.extract(airspace_name + '.dbf', TEMP_DIR)
+        shp_fn = zf.extract(airspace_name + '.shp', temp_dir)
+        shx_fn = zf.extract(airspace_name + '.shx', temp_dir)
+        dbf_fn = zf.extract(airspace_name + '.dbf', temp_dir)
         # Open interface to shapefile
         sf = Reader(shp_fn)
         # Iterate over shapes
