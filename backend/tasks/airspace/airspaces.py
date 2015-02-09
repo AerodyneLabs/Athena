@@ -1,10 +1,11 @@
 from helpers import download_latest_file
 from worker import app
 from tasks.mongoTask import MongoTask
+from os.path import dirname
 from zipfile import ZipFile
 from shapefile import Reader
 import geojson
-from os import dirname, remove
+from os import remove
 
 
 airspace_files = {
