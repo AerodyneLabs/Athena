@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from celery import Celery
 from kombu.serialization import register
-import serializer
+from tasks import serializer
 
 
 register(
@@ -17,8 +17,8 @@ app = Celery(
     broker='amqp://',
     backend='amqp',
     include=[
-        'airspaceTasks',
-        'atmosphereTasks'
+        'tasks.airspace',
+        'tasks.atmosphere'
     ]
 )
 
