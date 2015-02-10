@@ -92,6 +92,8 @@ def update_centers(self):
             cur_points = []
         lat = parse_dms(get_field(line, arb_fields['latitude']))
         lon = parse_dms(get_field(line, arb_fields['longitude']))
+        if lon <= -180:
+            lon += 360.0
         cur_points.append((lon, lat))
     # Clean up boundary file
     zf.close()
