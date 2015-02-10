@@ -2,6 +2,7 @@ from helpers import download_latest_file, get_field, parse_dms, RecordField
 from worker import app
 from tasks.mongoTask import MongoTask
 from zipfile import ZipFile
+from shapely.geometry import Polygon, mapping
 import geojson
 from os import remove
 
@@ -84,8 +85,8 @@ def update_centers(self):
             if cur_facility != '':
                 if cur_alt == 'HIGH':
                     cur_points.append(cur_points[0])
-                    poly = geojson.Polygon([cur_points])
-                    data[cur_facility]['geometry'] = poly
+                    poly = Polygon(cur_points).buffer(0)
+                    data[cur_facility]['geometry'] = mapping(poly)
             cur_facility = facility_id
             cur_alt = rec_alt
             cur_points = []
