@@ -53,12 +53,15 @@ def update_centers(self):
                 state = get_field(line, aff_fields['state_code'])
                 lat = parse_dms(get_field(line, aff_fields['latitude']))
                 lon = parse_dms(get_field(line, aff_fields['longitude']))
-                data[facility_id] = geojson.Feature(properties={
-                    'name': facility_name,
-                    'city': location,
-                    'state': state,
-                    'loc': geojson.Point([lon, lat])
-                }, id=facility_id)
+                data[facility_id] = geojson.Feature(
+                    properties={
+                        'name': facility_name,
+                        'city': location,
+                        'state': state,
+                        'loc': geojson.Point([lon, lat])
+                    },
+                    id=facility_id
+                )
     # Clean up facility file
     zf.close()
     remove(aff_fn)
@@ -104,6 +107,6 @@ def update_centers(self):
             record = rec
             record['_id'] = record.pop('id')
             store.update(
-                {'_id': rec.id}, {'$set': record}, upsert=True)
+                {'_id': id}, {'$set': record}, upsert=True)
     # Return meaningful result
     return count
