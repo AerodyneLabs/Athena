@@ -1,27 +1,26 @@
-import Ember from "ember";
-import config from "./config/environment";
+import Ember from 'ember';
+import config from './config/environment';
 
 var Router = Ember.Router.extend({
   location: config.locationType
 });
 
 Router.map(function() {
-  this.route("about");
-  this.route("forecastPeriods");
+  this.route('about');
 
-  this.route("forecastPeriod", {
-    path: "/foreastPeriod/:id"
+  this.route('forecastPeriods');
+  this.route('forecastPeriod', {
+    path: '/forecastPeriod/:id'
   });
 
-  this.route("soundings");
-
-  this.route("sounding", {
-    path: "/sounding/:id"
+  this.route('soundings');
+  this.route('sounding', {
+    path: '/sounding/:id'
   });
 
-  this.route("centers");
-  this.route("center", {
-    path: "/center/:id"
+  this.route('centers');
+  this.route('center', {
+    path: '/center/:id'
   });
 });
 
