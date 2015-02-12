@@ -5,20 +5,20 @@ var EmberApp = require('ember-cli/lib/broccoli/ember-app');
 var pickFiles = require('broccoli-static-compiler');
 
 var app = new EmberApp({
-	lessOptions: {
-		paths: [
-			'bower_components/bootstrap/less',
-			'bower_components/weather-icons/weather-icons'
-		]
-	}
+  lessOptions: {
+    paths: [
+      'bower_components/bootstrap/less',
+      'bower_components/weather-icons/weather-icons'
+    ]
+  }
 });
 
 app.import('bower_components/bootstrap/dist/js/bootstrap.js');
 app.import('bower_components/d3/d3.js');
 
 var extraAssets = pickFiles('bower_components/weather-icons', {
-	srcDir: '/font/',
-	destDir: '/assets/fonts'
+  srcDir: '/font/',
+  destDir: '/assets/fonts'
 });
 
 // Use `app.import` to add additional libraries to the generated
