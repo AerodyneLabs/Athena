@@ -2,6 +2,7 @@ var restify = require('restify');
 var socketio = require('socket.io');
 var monk = require('monk')('localhost/atmosphere');
 var airspace = require('monk')('localhost/airspace');
+var flights = require('monk')('localhost/flights');
 var celery = require('node-celery').createClient({
 	CELERY_BROKER_URL: 'amqp://guest:guest@localhost:5672',
 	CELERY_RESULT_BACKEND: 'amqp',
@@ -36,6 +37,26 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 		if(err) return next(err);
 
 		res.send({'forecastPeriod':doc});
+		return next();
+	});
+});
+
+server.get('api/flights', function(req, res, next) {
+	var store = flights.get('flights');
+	store.find({}, function(err, docs) {
+		if(err) return next(err);
+
+		res.send({'flights': docs});
+		return next();
+	});
+});
+
+server.get('api/flights/:id', function(req, res, next) {
+	var store = flights.get('flights');
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'flight': doc});
 		return next();
 	});
 });
