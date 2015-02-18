@@ -11,6 +11,7 @@ var celery = require('node-celery').createClient({
 
 var server = restify.createServer();
 server.use(restify.queryParser());
+server.use(restify.bodyParser());
 
 var io = socketio.listen(server);
 
@@ -54,6 +55,16 @@ server.get('api/predictions', function(req, res, next) {
 server.get('api/predictions/:id', function(req, res, next) {
 	var store = flights.get('predictions');
 	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'prediction': doc});
+		return next();
+	});
+});
+
+server.post('api/predictions', function(req, res, next) {
+	var store = flights.get('predictions');
+	store.insert(req.params.prediction, function(err, doc) {
 		if(err) return next(err);
 
 		res.send({'prediction': doc});
