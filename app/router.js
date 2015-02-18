@@ -32,6 +32,15 @@ Router.map(function() {
   this.route('navaid', {
     path: '/navaid/:id'
   });
+
+  this.resource('prediction', {
+    path: '/predictions'
+  }, function() {
+    this.route('create');
+    this.route('detail', {
+      path: '/:id'
+    });
+  });
 });
 
 export default Router;

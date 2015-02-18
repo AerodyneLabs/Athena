@@ -1,0 +1,12 @@
+<div class="page-header">
+  <h1>Predictions</h1>
+</div>
+<ul>
+  {{#each prediction in model}}
+    <li>
+      {{#link-to 'prediction.detail' prediction.id}}
+        {{prediction.launchTime}} @ {{prediction.launchLocation.latitude}}, {{prediction.launchLocation.longitude}}
+      {{/link-to}}
+    </li>
+  {{/each}}
+</ul>
