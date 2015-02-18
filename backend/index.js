@@ -43,7 +43,17 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 
 server.get('api/flights', function(req, res, next) {
 	var store = flights.get('flights');
-	store.find({}, function(err, docs) {
+	var query = {};
+	if(req.query.status) {
+		if(req.query.status == 'current') {
+			query.status = 'current';
+		} else if(req.query.status == 'upcoming') {
+			query.launchTime = {
+				$gt: new Date()
+			}
+		}
+	}
+	store.find(query, function(err, docs) {
 		if(err) return next(err);
 
 		res.send({'flights': docs});
