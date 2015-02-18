@@ -27,8 +27,8 @@
 						{{#if session.isAuthenticated}}
 							<a {{action 'invalidateSession'}}>Logout</a>
 						{{else}}
-							<a {{action 'loginWithGoogle'}}>
-								{{fa-icon "google-plus"}} Login with Google+
+							<a class="btn btn-default" {{action 'loginWithGoogle'}}>
+								{{fa-icon "google-plus"}} Login with Google
 							</a>
 						{{/if}}
 					</div>
