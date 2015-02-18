@@ -1,3 +1,20 @@
 <div class="page-header">
   <h1>New Prediction</h1>
 </div>
+<form class="form-horizontal" {{action "runPrediction" on="submit"}}>
+  <div class="form-group">
+    <label for="launchLocationInput" class="col-sm-2 control-label">Launch Location</label>
+    <div class="col-sm-10">
+      {{input elementId="launchLocationInput" value=launchLocationInput class="form-control" placeholder="DD.DDDD, DDD.DDDD"}}
+      <span class="help-block">Latitude and longitude in signed decimal degrees.</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="launchTimeInput" class="col-sm-2 control-label">Launch Time</label>
+    <div class="col-sm-10">
+      {{input elementId="launchTimeInput" value=launchTimeInput class="form-control" placeholder="YYYY-MM-DD HH:MM"}}
+      <span class="help-block">All dates and times are local unless suffixed by Z.</span>
+    </div>
+  </div>
+  <button class="btn btn-primary pull-right" type="submit">Run Prediction</button>
+</form>

@@ -14,12 +14,14 @@ export default DS.Transform.extend({
    * @return {JSON} GeoJSON serialized point
    */
   serialize: function(deserialized) {
+    console.log('serialize: ', deserialized);
 		var ser = {
 			type: 'Point',
 			coordinates: [
-				deserialized.get('longitude'), deserialized.get('latitude')
+				deserialized.longitude, deserialized.latitude
 			]
 		};
+    /*
 		var alt = deserialized.get('altitude');
 		var ts = deserialized.get('time');
 		if(isNaN(alt) === false) {
@@ -27,7 +29,7 @@ export default DS.Transform.extend({
 			if(isNaN(ts) === false) {
 				ser['coodinates'].push(ts);
 			}
-		}
+		}*/
 		return ser;
   },
 
