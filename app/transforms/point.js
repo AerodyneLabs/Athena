@@ -14,7 +14,6 @@ export default DS.Transform.extend({
    * @return {JSON} GeoJSON serialized point
    */
   serialize: function(deserialized) {
-    console.log('serialize: ', deserialized);
 		var ser = {
 			type: 'Point',
 			coordinates: [
