@@ -41,6 +41,26 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 	});
 });
 
+server.get('api/predictions', function(req, res, next) {
+	var store = flights.get('predictions');
+	store.find({}, function(err, docs) {
+		if(err) return next(err);
+
+		res.send({'predictions': docs});
+		return next();
+	});
+});
+
+server.get('api/predictions/:id', function(req, res, next) {
+	var store = flights.get('predictions');
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'prediction': doc});
+		return next();
+	});
+});
+
 server.get('api/flights', function(req, res, next) {
 	var store = flights.get('flights');
 	var query = {};
