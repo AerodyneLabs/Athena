@@ -1,0 +1,10 @@
+<h2>Navigation Aids</h2>
+<ul>
+  {{#each navaid in model}}
+    <li>
+      {{#link-to 'navaid' navaid.id}}
+        {{navaid.id}} - {{navaid.properties.name}}
+      {{/link-to}}
+    </li>
+  {{/each}}
+</ul>

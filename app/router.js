@@ -27,6 +27,11 @@ Router.map(function() {
   this.route('flight', {
     path: '/flight/:id'
   });
+
+  this.route('navaids');
+  this.route('navaid', {
+    path: '/navaid/:id'
+  });
 });
 
 export default Router;
