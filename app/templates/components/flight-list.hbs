@@ -4,7 +4,11 @@
       <div></div>
     </div>
     <div class="media-body">
-      <h4>{{flight.name}}</h4>
+      <h4>
+        {{#link-to 'flight' flight.id}}
+          {{flight.name}}
+        {{/link-to}}
+      </h4>
       {{flight.launchTime}} {{flight.launchLocation.latitude}}, {{flight.launchLocation.longitude}}
     </div>
   </div>

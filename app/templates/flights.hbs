@@ -1,0 +1,10 @@
+<h2>Flights</h2>
+<ul>
+{{#each flight in model}}
+  <li>
+    <h3>{{#link-to 'flight' flight.id}}{{flight.name}}{{/link-to}}</h3>
+    {{flight.launchTime}}
+    {{flight.launchLocation.latitude}}, {{flight.launchLocation.longitude}}
+  </li>
+{{/each}}
+</ul>

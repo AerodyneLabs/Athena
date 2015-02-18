@@ -22,6 +22,11 @@ Router.map(function() {
   this.route('center', {
     path: '/center/:id'
   });
+
+  this.route('flights');
+  this.route('flight', {
+    path: '/flight/:id'
+  });
 });
 
 export default Router;
