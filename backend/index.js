@@ -64,11 +64,21 @@ server.get('api/predictions/:id', function(req, res, next) {
 
 server.post('api/predictions', function(req, res, next) {
 	var store = flights.get('predictions');
-	store.insert(req.params.prediction, function(err, doc) {
-		if(err) return next(err);
+	var params = req.params.prediction;
+	var result = celery.call(
+		'tasks.predictor.latex1v0.run_prediction',
+		[params]
+	);
+	result.once('success', function(data) {
+		store.insert(data.result, function(err, doc) {
+			if(err) return next(err);
 
-		res.send({'prediction': doc});
-		return next();
+			res.send({'prediction': doc});
+			return next();
+		});
+	});
+	result.once('failed', function(data) {
+		return next(data);
 	});
 });
 
