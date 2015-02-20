@@ -36,9 +36,13 @@ Router.map(function() {
   this.resource('prediction', {
     path: '/predictions'
   }, function() {
-    this.route('create');
     this.route('detail', {
       path: '/:id'
+    });
+    this.route('wizard', function() {
+      this.route('1');
+      this.route('2');
+      this.route('3');
     });
   });
 });
