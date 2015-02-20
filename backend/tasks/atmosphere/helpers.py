@@ -9,7 +9,7 @@ def get_url(model_run, forecast_hours):
         day=model_run.day,
         run=model_run.hour
     )
-    forecast_file = 'gfs.t{run:02d}z.pgrb2f{forecast:02d}'.format(
+    forecast_file = 'gfs.t{run:02d}z.pgrb2.1p00.f{forecast:03d}'.format(
         run=model_run.hour,
         forecast=forecast_hours
     )
