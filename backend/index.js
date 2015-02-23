@@ -3,6 +3,7 @@ var socketio = require('socket.io');
 var monk = require('monk')('localhost/atmosphere');
 var airspace = require('monk')('localhost/airspace');
 var flights = require('monk')('localhost/flights');
+var request = require('request');
 var celery = require('node-celery').createClient({
 	CELERY_BROKER_URL: 'amqp://guest:guest@localhost:5672',
 	CELERY_RESULT_BACKEND: 'amqp',
@@ -309,6 +310,31 @@ server.get('api/navaids/:id', function(req, res, next) {
 		res.send({'navaid': doc});
 		return next();
 	});
+});
+
+server.get('api/geocode', function(req, res, next) {
+  var baseUrl = 'http://open.mapquestapi.com/geocoding/v1/address';
+  var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
+  request.post({
+    uri: url,
+    json: true,
+    body: {
+      location: req.query.address,
+      options: {
+        maxResults: 1,
+        thumbMaps: false
+      }
+    }
+  }, function(error, response, body) {
+    if(error) return next(error);
+    
+    var loc = body.results[0].locations[0];
+    res.send({'location': {
+      'type': 'Point',
+      'coordinates': [loc.latLng.lng, loc.latLng.lat]
+    }});
+    return next();
+  });
 });
 
 server.get('api/airspaces/:lat1/:lon1/:lat2/:lon2', function(req, res, next) {
