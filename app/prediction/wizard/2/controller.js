@@ -1,6 +1,19 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+  balloons: [
+    'Kaymont 200g',
+    'Kaymont 300g',
+    'Kaymont 350g',
+    'Kaymont 600g',
+    'Kaymont 800g',
+    'Kaymont 1000g',
+    'Kaymont 1200g',
+    'Kaymont 1500g',
+    'Kaymont 2000g',
+    'Kaymont 3000g'
+  ],
+  balloon: '',
   needs: ['prediction/wizard'],
   actions: {
     back: function() {

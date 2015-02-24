@@ -1,7 +1,66 @@
 <h2>Balloon and Payload</h2>
 <div class="row">
   <div class="col-md-4">
-    <form>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label class="col-md-4 control-label">Gas Type</label>
+        <div class="col-md-4">
+          <label class="radio-inline">
+            <input type="radio" name="gasType" id="hydrogen" value="hydrogen">
+            Hydrogen
+          </label>
+        </div>
+        <div class="col-md-4">
+          <label class="radio-inline">
+            <input type="radio" name="gasType" id="helium" value="helium">
+            Helium
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="balloonSelect" class="col-md-4 control-label">Balloon</label>
+        <div class="col-md-8">
+          {{view "select" elementId="balloonSelect" content=balloons class="form-control" value=balloon}}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="payloadMass" class="col-md-4 control-label">Payload Mass</label>
+        <div class="col-md-8">
+          <div class="input-group">
+            {{input elementId="payloadMass" value=payloadMass class="form-control"}}
+            <span class="input-group-addon">units</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="netLift" class="col-md-4 control-label">Net Lift</label>
+        <div class="col-md-8">
+          <div class="input-group">
+            {{input elementId="netLift" value=payloadMass class="form-control"}}
+            <span class="input-group-addon">units</span>
+          </div>
+        </div>
+      </div>
+      <p class="text-center">or</p>
+      <div class="form-group">
+        <label for="ascentRate" class="col-md-4 control-label">Ascent Rate</label>
+        <div class="col-md-8">
+          <div class="input-group">
+            {{input elementId="ascentRate" value=payloadMass class="form-control"}}
+            <span class="input-group-addon">units</span>
+          </div>
+        </div>
+      </div>
+      <p class="text-center">or</p>
+      <div class="form-group">
+        <label for="targetAltitude" class="col-md-4 control-label">Target Altitude</label>
+        <div class="col-md-8">
+          <div class="input-group">
+            {{input elementId="targetAltitude" value=payloadMass class="form-control"}}
+            <span class="input-group-addon">units</span>
+          </div>
+        </div>
+      </div>
       <div class="btn-group pull-right" role="group">
         <button class="btn btn-default" type="button" {{action "back"}}>Back</button>
         <button class="btn btn-primary" type="button" {{action "next"}}>Next</button>
