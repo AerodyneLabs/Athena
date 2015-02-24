@@ -4,10 +4,10 @@ export default Ember.Controller.extend({
   needs: ['prediction/wizard'],
   actions: {
     back: function() {
-      this.transitionToRoute('prediction.wizard.2');
+      this.transitionToRoute('prediction.wizard.3');
     },
-    next: function() {
-      this.transitionToRoute('prediction.wizard.4');
+    run: function() {
+      console.log('Run prediction');
     }
   }
 });
