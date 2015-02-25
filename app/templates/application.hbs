@@ -45,19 +45,19 @@
 							<fieldset>
 								<div class="form-group">
 									<label for="massUnits">Mass</label>
-									{{view "select" elementId="massUnits" content=massUnits value=massUnit class="form-control"}}
+									{{view "select" elementId="massUnits" content=unitOptions.mass value=units.mass class="form-control"}}
 								</div>
 								<div class="form-group">
 									<label for="altitudeUnits">Altitude</label>
-									{{view "select" elementId="altitudeUnits" content=altitudeUnits value=altitudeUnit class="form-control"}}
+									{{view "select" elementId="altitudeUnits" content=unitOptions.altitude value=units.altitude class="form-control"}}
 								</div>
 								<div class="form-group">
 									<label for="speedUnits">Speed</label>
-									{{view "select" elementId="speedUnits" content=speedUnits value=speedUnit class="form-control"}}
+									{{view "select" elementId="speedUnits" content=unitOptions.speed value=units.speed class="form-control"}}
 								</div>
 								<div class="form-group">
 									<label for="distanceUnits">Distance</label>
-									{{view "select" elementId="distanceUnits" content=distanceUnits value=distanceUnit class="form-control"}}
+									{{view "select" elementId="distanceUnits" content=unitOptions.distance value=units.distance class="form-control"}}
 								</div>
 							</fieldset>
 						</form>
