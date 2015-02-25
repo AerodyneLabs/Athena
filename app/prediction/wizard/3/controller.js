@@ -50,7 +50,8 @@ export default Ember.Controller.extend({
     var area = 3.1415 * ((r1 * r1) - (r2 * r2));
     this.set('parachuteArea', area);
   }.observes('parachuteRadius', 'parachuteSpillRadius'),
-  needs: ['prediction/wizard'],
+  needs: ['application', 'prediction/wizard'],
+  units: Ember.computed.alias('controllers.application.units'),
   actions: {
     back: function() {
       this.transitionToRoute('prediction.wizard.2');
