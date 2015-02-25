@@ -10,13 +10,15 @@ export default Ember.Controller.extend(LoginControllerMixin, {
 	units: {
 		altitude: 'm',
 		distance: 'km',
+		length: 'cm',
 		mass: 'kg',
 		speed: 'm/s'
 	},
-	
+
 	unitOptions: {
 		altitude: ['m', 'km', 'ft', 'mi'],
 		distance: ['km', 'mi', 'nm'],
+		length: ['cm', 'm', 'in', 'ft'],
 		mass: ['kg', 'lb'],
 		speed: ['m/s', 'kph', 'f/s', 'mph', 'kts']
 	},
