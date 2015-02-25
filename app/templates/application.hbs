@@ -41,9 +41,26 @@
 						{{fa-icon "cog"}} <span class="caret"></span>
 					</a>
 					<div class="dropdown-menu" role="menu">
-						{{#em-form submit_button=false model=controller}}
-						{{em-select property="units" label="Unit System" contentBinding="unitsOptions" optionValuePath="content.id" optionLabelPath="content.name"}}
-						{{/em-form}}
+						<form>
+							<fieldset>
+								<div class="form-group">
+									<label for="massUnits">Mass</label>
+									{{view "select" elementId="massUnits" content=massUnits value=massUnit class="form-control"}}
+								</div>
+								<div class="form-group">
+									<label for="altitudeUnits">Altitude</label>
+									{{view "select" elementId="altitudeUnits" content=altitudeUnits value=altitudeUnit class="form-control"}}
+								</div>
+								<div class="form-group">
+									<label for="speedUnits">Speed</label>
+									{{view "select" elementId="speedUnits" content=speedUnits value=speedUnit class="form-control"}}
+								</div>
+								<div class="form-group">
+									<label for="distanceUnits">Distance</label>
+									{{view "select" elementId="distanceUnits" content=distanceUnits value=distanceUnit class="form-control"}}
+								</div>
+							</fieldset>
+						</form>
 					</div>
 				</li>
 			</ul>
