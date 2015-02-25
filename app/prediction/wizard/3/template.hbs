@@ -8,12 +8,32 @@
           {{view "select" elementId="parachuteSelect" content=parachutes value=parachute class="form-control"}}
         </div>
       </div>
+      {{#if isCustom}}
+        <div class="form-group">
+          <label for="parachuteRadius" class="col-md-4 control-label">Chute Radius</label>
+          <div class="col-md-8">
+            <div class="input-group">
+              {{input elementId="parachuteRadius" value=parachuteRadius class="form-control"}}
+              <span class="input-group-addon">m</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="parachuteSpillRadius" class="col-md-4 control-label">Vent Radius</label>
+          <div class="col-md-8">
+            <div class="input-group">
+              {{input elementId="parachuteSpillRadius" value=parachuteSpillRadius class="form-control"}}
+              <span class="input-group-addon">m</span>
+            </div>
+          </div>
+        </div>
+      {{/if}}
       <div class="form-group">
         <label for="parachuteArea" class="col-md-4 control-label">Area</label>
         <div class="col-md-8">
           <div class="input-group">
             {{input elementId="parachuteArea" value=parachuteArea class="form-control" readonly=isStatic}}
-            <span class="input-group-addon">units</span>
+            <span class="input-group-addon">m<sup>2</sup></span>
           </div>
         </div>
       </div>
@@ -23,9 +43,6 @@
           {{input elementId="parachuteDrag" value=parachuteDrag class="form-control" readonly=isStatic}}
         </div>
       </div>
-      {{#if isCustom}}
-        blah blah blah
-      {{/if}}
       <div class="btn-group pull-right" role="group">
         <button class="btn btn-default" type="button" {{action "back"}}>Back</button>
         <button class="btn btn-primary" type="button" {{action "next"}}>Next</button>

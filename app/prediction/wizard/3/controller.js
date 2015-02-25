@@ -12,15 +12,17 @@ export default Ember.Controller.extend({
     'Fruity Elliptical 60"'
   ],
   parachuteData: {
-    'Fruity Elliptical 24"': {area: 24, drag: 1.5},
-    'Fruity Elliptical 30"': {area: 30, drag: 1.5},
-    'Fruity Elliptical 36"': {area: 36, drag: 1.5},
-    'Fruity Elliptical 42"': {area: 42, drag: 1.5},
-    'Fruity Elliptical 48"': {area: 48, drag: 1.5},
-    'Fruity Elliptical 60"': {area: 60, drag: 1.5}
+    'Fruity Elliptical 24"': {area: 0.2877, drag: 1.5},
+    'Fruity Elliptical 30"': {area: 0.4, drag: 1.5},
+    'Fruity Elliptical 36"': {area: 0.5626, drag: 1.5},
+    'Fruity Elliptical 42"': {area: 0.751, drag: 1.5},
+    'Fruity Elliptical 48"': {area: 0.9374, drag: 1.5},
+    'Fruity Elliptical 60"': {area: 1.502, drag: 1.5}
   },
   parachuteArea: 0,
   parachuteDrag: 0,
+  parachuteRadius: 0,
+  parachuteSpillRadius: 0,
   isCustom: function() {
     if(this.get('parachute') === 'Custom') {
       return true;
@@ -35,10 +37,19 @@ export default Ember.Controller.extend({
   }.property('parachute'),
   parachuteChanged: function() {
     var chute = this.get('parachute');
+    if(chute === 'Custom') {
+      return;
+    }
     var chuteData = this.parachuteData[chute];
     this.set('parachuteArea', chuteData.area);
     this.set('parachuteDrag', chuteData.drag);
   }.observes('parachute'),
+  computeArea: function() {
+    var r1 = this.get('parachuteRadius');
+    var r2 = this.get('parachuteSpillRadius');
+    var area = 3.1415 * ((r1 * r1) - (r2 * r2));
+    this.set('parachuteArea', area);
+  }.observes('parachuteRadius', 'parachuteSpillRadius'),
   needs: ['prediction/wizard'],
   actions: {
     back: function() {
