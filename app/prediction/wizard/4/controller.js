@@ -1,6 +1,8 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+  time: '',
+  date: '',
   needs: ['prediction/wizard'],
   actions: {
     back: function() {
