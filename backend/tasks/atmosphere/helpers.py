@@ -30,7 +30,7 @@ def generate_sounding(
     }
     for h, p, t, u, v in zip(height, pressure, temperature, u, v):
         sounding['profile'].append({
-            'h': h, 'p': p, 't': t, 'u': u, 'v': v
+            'h': h.item(), 'p': p.item(), 't': t.item(), 'u': u.item(), 'v': v.item()
         })
 
     return dict(kwargs.items() + sounding.items())
