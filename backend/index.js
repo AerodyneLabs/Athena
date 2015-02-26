@@ -179,10 +179,10 @@ server.get('api/centers', function(req, res, next) {
 	if(req.query.within) {
 		var coords = JSON.parse(req.query.within);
 		var box = [
-		  coords[0],
-		  [coords[1][0], coords[0][1]],
-		  coords[1],
-		  [coords[0][0], coords[1][1]],
+			coords[0],
+			[coords[1][0], coords[0][1]],
+			coords[1],
+			[coords[0][0], coords[1][1]],
 			coords[0]
 		];
 		query = {
@@ -225,6 +225,40 @@ server.get('api/soundings', function(req, res, next) {
 	});
 });
 
+var fetch_sounding = function(time, lat, lon, next) {
+	var store = monk.get('forecast');
+	store.findOne({
+		'forecast': time,
+		'loc.coordinates': [lon, lat]
+	}, function(err, doc) {
+		if(doc) {
+			if(next) {
+				next(null, doc);
+			}
+			return;
+		} else {
+			var result = celery.call(
+				'tasks.atmosphere.extract_sounding.extract_sounding',
+				[time, lat, lon]
+			);
+			result.once('success', function(data) {
+				if(next) {
+					store.findById(data.result[0], function(err, doc) {
+						next(err, doc);
+					});
+				}
+				return;
+			});
+			result.once('failed', function(data) {
+				if(next) {
+					next(data);
+				}
+				return;
+			});
+		}
+	});
+};
+
 server.get('api/soundings/:id', function(req, res, next) {
 	var store = monk.get('forecast');
 	store.findById(req.params.id, function(err, doc) {
@@ -233,6 +267,45 @@ server.get('api/soundings/:id', function(req, res, next) {
 		res.send({'sounding':doc});
 		return next();
 	});
+});
+
+server.post('api/soundings/prefetch', function(req, res, next) {
+	var store = monk.get('fs.files');
+	if(req.params.near) {
+		try {
+			var coords = JSON.parse(req.params.near);
+		} catch(SyntaxError) {
+			return next(new restify.BadRequestError('"near" parameter invalid!'));
+		}
+		var lat = Number(coords[1]);
+		var lon = Number(coords[0]);
+		if(
+			isNaN(lat) || isNaN(lon) ||
+			lat <= -90 || lat >= 90 ||
+			lon <= -180 || lon > 180
+		) {
+			return next(new restify.BadRequestError('"near" parameter invalid!'));
+		}
+		var now = new Date();
+		var filter = new Date(now.getTime() - (6 * 60 * 60 * 1000));
+		console.log('Filtering > ', filter);
+		store.find({
+			forecast: {
+				$gte: filter
+			}
+		}, 'forecast', function(err, docs) {
+			if(err) return next(err);
+
+			for(var i = 0; i < docs.length; i++) {
+				fetch_sounding(docs[i].forecast, lat, lon);
+			}
+
+			res.send({fetching: docs});
+			return next();
+		});
+	} else {
+		return next(new restify.BadRequestError('"near" query parameter missing!'));
+	}
 });
 
 // Get sounding from database
@@ -313,93 +386,93 @@ server.get('api/navaids/:id', function(req, res, next) {
 });
 
 server.get('api/geo/address', function(req, res, next) {
-  var baseUrl = 'http://open.mapquestapi.com/geocoding/v1/address';
-  var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
-  request.post({
-    uri: url,
-    json: true,
-    body: {
-      location: req.query.address,
-      options: {
-        maxResults: 1,
-        thumbMaps: false
-      }
-    }
-  }, function(error, response, body) {
-    if(error) return next(error);
-    
-    var loc = body.results[0].locations[0];
-    res.send({'location': {
-      'type': 'Point',
-      'coordinates': [loc.latLng.lng, loc.latLng.lat]
-    }});
-    return next();
-  });
+	var baseUrl = 'http://open.mapquestapi.com/geocoding/v1/address';
+	var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
+	request.post({
+		uri: url,
+		json: true,
+		body: {
+			location: req.query.address,
+			options: {
+				maxResults: 1,
+				thumbMaps: false
+			}
+		}
+	}, function(error, response, body) {
+		if(error) return next(error);
+		
+		var loc = body.results[0].locations[0];
+		res.send({'location': {
+			'type': 'Point',
+			'coordinates': [loc.latLng.lng, loc.latLng.lat]
+		}});
+		return next();
+	});
 });
 
 server.get('api/geo/reverse', function(req, res, next) {
-  var baseUrl = 'http://open.mapquestapi.com/geocoding/v1/reverse';
-  var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
-  var coords = JSON.parse(req.query.location);
-  request.post({
-    uri: url,
-    json: true,
-    body: {
-      location: {
-        latLng: {
-          lat: coords[1],
-          lng: coords[0]
-        }
-      },
-      options: {
-        maxResults: 1,
-        thumbMaps: false
-      }
-    }
-  }, function(error, response, body) {
-    if(error) return next(error);
+	var baseUrl = 'http://open.mapquestapi.com/geocoding/v1/reverse';
+	var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
+	var coords = JSON.parse(req.query.location);
+	request.post({
+		uri: url,
+		json: true,
+		body: {
+			location: {
+				latLng: {
+					lat: coords[1],
+					lng: coords[0]
+				}
+			},
+			options: {
+				maxResults: 1,
+				thumbMaps: false
+			}
+		}
+	}, function(error, response, body) {
+		if(error) return next(error);
 
-    var address = body.results[0].locations[0];
-    res.send({'address': {
-      city: address.adminArea5,
-      county: address.adminArea4,
-      state: address.adminArea3,
-      country: address.adminArea1,
-      postalCode: address.postalCode
-    }});
-    return next();
-  });
+		var address = body.results[0].locations[0];
+		res.send({'address': {
+			city: address.adminArea5,
+			county: address.adminArea4,
+			state: address.adminArea3,
+			country: address.adminArea1,
+			postalCode: address.postalCode
+		}});
+		return next();
+	});
 });
 
 server.get('api/geo/altitude', function(req, res, next) {
-  var baseUrl = 'http://open.mapquestapi.com/elevation/v1/profile';
-  var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
-  var coords = JSON.parse(req.query.location);
-  var latlngs = [];
-  coords.forEach(function(x) {
-    latlngs.push(x[1]);
-    latlngs.push(x[0]);
-  });
-  request.post({
-    uri: url,
-    json: true,
-    body: {
-      latLngCollection: latlngs
-    }
-  }, function(error, response, body) {
-    if(error) return next(error);
+	var baseUrl = 'http://open.mapquestapi.com/elevation/v1/profile';
+	var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
+	var coords = JSON.parse(req.query.location);
+	var latlngs = [];
+	coords.forEach(function(x) {
+		latlngs.push(x[1]);
+		latlngs.push(x[0]);
+	});
+	request.post({
+		uri: url,
+		json: true,
+		body: {
+			latLngCollection: latlngs
+		}
+	}, function(error, response, body) {
+		if(error) return next(error);
 
-    var alts = body.elevationProfile;
-    var result = new Array(coords.length);
-    for(var i = 0; i < alts.length; i++) {
-      result[i] = {
-        type: 'Point',
-        coordinates: [coords[i][0], coords[i][1], alts[i].height]
-      };
-    }
-    res.send({'locations': result});
-    return next();
-  });
+		var alts = body.elevationProfile;
+		var result = new Array(coords.length);
+		for(var i = 0; i < alts.length; i++) {
+			result[i] = {
+				type: 'Point',
+				coordinates: [coords[i][0], coords[i][1], alts[i].height]
+			};
+		}
+		res.send({'locations': result});
+		return next();
+	});
 });
 
 server.get('api/airspaces/:lat1/:lon1/:lat2/:lon2', function(req, res, next) {
