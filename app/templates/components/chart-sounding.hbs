@@ -8,13 +8,13 @@
 		<path class="data"></path>
 		<g class="axis">
 			<text class="axis-label" y="2em" dy=".35em" {{bind-attr x=tempLabel}}>
-				Temperature ({{units-unit units "temperature"}})
+				Temperature ({{units.temperature}})
 			</text>
 		</g>
 	</g>
 	<g class="axis altitude">
 		<text class="axis-label" y=".75em" dy=".35em" transform="rotate(-90)" {{bind-attr x=verticalLabel}}>
-			Altitude ({{units-unit units "altitude"}})
+			Altitude ({{units.altitude}})
 		</text>
 	</g>
 	<g class="wind" {{bind-attr transform=transformWind}}>
@@ -22,7 +22,7 @@
 		<g class="direction"></g>
 		<g class="axis">
 			<text class="axis-label" y="2em" dy=".35em" {{bind-attr x=windLabel}}>
-				Wind Speed ({{units-unit units "highSpeed"}})
+				Wind Speed ({{units.speed}})
 			</text>
 		</g>
 	</g>

@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import {convertLength} from 'athena/helpers/convert-length';
 
 export default Ember.Controller.extend({
   parachute: 'Custom',
@@ -40,10 +41,12 @@ export default Ember.Controller.extend({
     if(chute === 'Custom') {
       return;
     }
+    var unit = this.get('controllers.application.units.length');
     var chuteData = this.parachuteData[chute];
-    this.set('parachuteArea', chuteData.area);
+    var area = convertLength(convertLength(chuteData.area, unit), unit);
+    this.set('parachuteArea', area);
     this.set('parachuteDrag', chuteData.drag);
-  }.observes('parachute'),
+  }.observes('parachute', 'controllers.application.units.length'),
   computeArea: function() {
     var r1 = this.get('parachuteRadius');
     var r2 = this.get('parachuteSpillRadius');
