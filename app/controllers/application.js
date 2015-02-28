@@ -12,6 +12,7 @@ export default Ember.Controller.extend(LoginControllerMixin, {
 		distance: 'km',
 		length: 'cm',
 		mass: 'kg',
+		pressure: 'Pa',
 		speed: 'm/s',
 		temperature: 'C'
 	},
@@ -21,6 +22,7 @@ export default Ember.Controller.extend(LoginControllerMixin, {
 		distance: ['km', 'mi', 'nm'],
 		length: ['cm', 'm', 'in', 'ft'],
 		mass: ['kg', 'lb'],
+		pressure: ['Pa', 'hPa', 'Psi', 'mmHg', 'inMg'],
 		speed: ['m/s', 'kph', 'f/s', 'mph', 'kts'],
 		temperature: ['C', 'F']
 	},

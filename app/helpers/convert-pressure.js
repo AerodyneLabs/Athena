@@ -5,7 +5,8 @@ var pressureFactors = {
   hPa: 0.01,
   mbar: 0.01,
   mmHg: 0.00750061683,
-  inHg: 0.000295333727
+  inHg: 0.000295333727,
+  Psi: 0.000145037738
 };
 
 export function convertPressure(value, unit) {

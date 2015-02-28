@@ -41,7 +41,7 @@
 						{{fa-icon "cog"}} <span class="caret"></span>
 					</a>
 					<div class="dropdown-menu settings-menu" role="menu">
-						<div class="form-horizontal">
+						<form class="form-horizontal">
 							<div class="form-group form-group-sm">
 								<label class="col-sm-6 control-label" for="altitudeUnits">Altitude</label>
 								<div class="col-sm-6">
@@ -67,6 +67,12 @@
 								</div>
 							</div>
 							<div class="form-group form-group-sm">
+								<label class="col-sm-6 control-label" for="pressureUnits">Pressure</label>
+								<div class="col-sm-6">
+									{{view "select" elementId="pressureUnits" content=unitOptions.pressure value=units.pressure class="form-control"}}
+								</div>
+							</div>
+							<div class="form-group form-group-sm">
 								<label class="col-sm-6 control-label" for="speedUnits">Speed</label>
 								<div class="col-sm-6">
 									{{view "select" elementId="speedUnits" content=unitOptions.speed value=units.speed class="form-control"}}
@@ -78,7 +84,7 @@
 									{{view "select" elementId="temperatureUnits" content=unitOptions.temperature value=units.temperature class="form-control"}}
 								</div>
 							</div>
-						</div>
+						</form>
 					</div>
 				</li>
 			</ul>
