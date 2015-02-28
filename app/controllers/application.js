@@ -7,25 +7,23 @@ import LoginControllerMixin from 'simple-auth/mixins/login-controller-mixin';
  * @extends Ember.Controller
  */
 export default Ember.Controller.extend(LoginControllerMixin, {
-	/**
-	 * Default unit system id
-	 * @property unts
-	 * @type String
-	 */
-	units: 'metric',
+	units: {
+		altitude: 'm',
+		distance: 'km',
+		length: 'cm',
+		mass: 'kg',
+		speed: 'm/s',
+		temperature: 'C'
+	},
 
-	/**
-	 * Array of unit systems
-	 * @property unitsOptions
-	 * @type Array
-	 */
-	unitsOptions: [{
-		id: 'imperial',
-		name: 'Imperial'
-	}, {
-		id: 'metric',
-		name: 'Metric'
-	}],
+	unitOptions: {
+		altitude: ['m', 'km', 'ft', 'mi'],
+		distance: ['km', 'mi', 'nm'],
+		length: ['cm', 'm', 'in', 'ft'],
+		mass: ['kg', 'lb'],
+		speed: ['m/s', 'kph', 'f/s', 'mph', 'kts'],
+		temperature: ['C', 'F']
+	},
 
 	time: new Date(),
 

@@ -14,7 +14,8 @@ export default Ember.Controller.extend({
     'Kaymont 3000g'
   ],
   balloon: '',
-  needs: ['prediction/wizard'],
+  needs: ['application', 'prediction/wizard'],
+  units: Ember.computed.alias('controllers.application.units'),
   actions: {
     back: function() {
       this.transitionToRoute('prediction.wizard.1');

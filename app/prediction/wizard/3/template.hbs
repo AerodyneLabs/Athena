@@ -14,7 +14,7 @@
           <div class="col-md-8">
             <div class="input-group">
               {{input elementId="parachuteRadius" value=parachuteRadius class="form-control"}}
-              <span class="input-group-addon">m</span>
+              <span class="input-group-addon">{{units.length}}</span>
             </div>
           </div>
         </div>
@@ -23,7 +23,7 @@
           <div class="col-md-8">
             <div class="input-group">
               {{input elementId="parachuteSpillRadius" value=parachuteSpillRadius class="form-control"}}
-              <span class="input-group-addon">m</span>
+              <span class="input-group-addon">{{units.length}}</span>
             </div>
           </div>
         </div>
@@ -33,7 +33,7 @@
         <div class="col-md-8">
           <div class="input-group">
             {{input elementId="parachuteArea" value=parachuteArea class="form-control" readonly=isStatic}}
-            <span class="input-group-addon">m<sup>2</sup></span>
+            <span class="input-group-addon">{{units.length}}<sup>2</sup></span>
           </div>
         </div>
       </div>

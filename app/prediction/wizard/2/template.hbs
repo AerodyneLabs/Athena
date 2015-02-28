@@ -28,7 +28,7 @@
         <div class="col-md-8">
           <div class="input-group">
             {{input elementId="payloadMass" value=payloadMass class="form-control"}}
-            <span class="input-group-addon">units</span>
+            <span class="input-group-addon">{{units.mass}}</span>
           </div>
         </div>
       </div>
@@ -37,7 +37,7 @@
         <div class="col-md-8">
           <div class="input-group">
             {{input elementId="netLift" value=payloadMass class="form-control"}}
-            <span class="input-group-addon">units</span>
+            <span class="input-group-addon">{{units.mass}}</span>
           </div>
         </div>
       </div>
@@ -46,8 +46,8 @@
         <label for="ascentRate" class="col-md-4 control-label">Ascent Rate</label>
         <div class="col-md-8">
           <div class="input-group">
-            {{input elementId="ascentRate" value=payloadMass class="form-control"}}
-            <span class="input-group-addon">units</span>
+            {{input elementId="ascentRate" value=ascentRate class="form-control"}}
+            <span class="input-group-addon">{{units.speed}}</span>
           </div>
         </div>
       </div>
@@ -56,8 +56,8 @@
         <label for="targetAltitude" class="col-md-4 control-label">Target Altitude</label>
         <div class="col-md-8">
           <div class="input-group">
-            {{input elementId="targetAltitude" value=payloadMass class="form-control"}}
-            <span class="input-group-addon">units</span>
+            {{input elementId="targetAltitude" value=targetAltitude class="form-control"}}
+            <span class="input-group-addon">{{units.altitude}}</span>
           </div>
         </div>
       </div>

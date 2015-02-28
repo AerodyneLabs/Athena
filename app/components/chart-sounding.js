@@ -1,5 +1,8 @@
 import Ember from 'ember';
-import convert from 'athena/helpers/units';
+import {convertLength} from 'athena/helpers/convert-length';
+import {convertPressure} from 'athena/helpers/convert-pressure';
+import {convertSpeed} from 'athena/helpers/convert-speed';
+import {convertTemperature} from 'athena/helpers/convert-temperature';
 
 /**
  * A component to display a sounding chart
@@ -146,17 +149,17 @@ export default Ember.Component.extend({
 		var tempScale = d3.scale.linear()
 			.range([0, tempWidth])
 			.domain(d3.extent(data, function(d) {
-				return convert(units, 'temperature', d['t']).value;
+				return convertTemperature(d['t'], units.temperature);
 			}));
 		var altScale = d3.scale.linear()
 			.range([height, 0])
 			.domain(d3.extent(data, function(d) {
-				return convert(units, 'altitude', d['h']).value;
+				return convertLength(d['h'], units.altitude);
 			}));
 		var windScale = d3.scale.linear()
 			.range([0, windWidth])
 			.domain([0, d3.max(data, function(d) {
-				return convert(units, 'highSpeed', d['ws']).value;
+				return convertSpeed(d['ws'], units.speed);
 			})]);
 
 		var tempAxis = d3.svg.axis()
@@ -171,19 +174,19 @@ export default Ember.Component.extend({
 			.ticks(4);
 
 		var altitude = function(d) {
-			return altScale(convert(units, 'altitude', d['h']).value) - height;
+			return altScale(convertLength(d['h'], units.altitude)) - height;
 		};
 
 		var line = d3.svg.line()
 			.x(function(d) {
-				return tempScale(convert(units, 'temperature', d['t']).value);
+				return tempScale(convertTemperature(d['t'], units.temperature));
 			})
 			.y(altitude)
 			.interpolate('linear');
 
 		var wind = d3.svg.line()
 			.x(function(d) {
-				return windScale(convert(units, 'highSpeed', d['ws']).value);
+				return windScale(convertSpeed(d['ws'], units.speed));
 			})
 			.y(altitude)
 			.interpolate('linear');
@@ -200,7 +203,7 @@ export default Ember.Component.extend({
 			.attr('font-family', 'weathericons')
 			.attr('dy', '.35em')
 			.attr('transform', function(d) {
-				var x = windScale(convert(units, 'highSpeed', d['ws']).value);
+				var x = windScale(convertSpeed(d['ws'], units.speed));
 				var y = altitude(d);
 				return 'translate(' + x + ',' + y + '), rotate(' + d['wd'] + ')';
 			})
@@ -257,7 +260,7 @@ export default Ember.Component.extend({
 			});
 
 		var bisectAlt = d3.bisector(function(a, b) {
-			return b - convert(units, 'altitude', a['h']).value;
+			return b - convertLength(a['h'], units.altitude);
 		}).left;
 
 		var focus = svg.select('.focus')
@@ -280,14 +283,14 @@ export default Ember.Component.extend({
 			var d = y0 - d0['h'] < d1['h'] - y0 ? d1 : d0;
 			var y = altitude(d);
 			focus.attr('transform', 'translate(0,' + (y + height) + ')');
-			var altRes = convert(units, 'altitude', d['h']);
-			var tempRes = convert(units, 'temperature', d['t']);
-			var presRes = convert(units, 'pressure', d['p']);
-			var windRes = convert(units, 'highSpeed', d['ws']);
-			var alt = altRes.value + ' ' + altRes.unit;
-			var temp = tempRes.value + ' ' + tempRes.unit;
-			var pres = presRes.value + ' ' + presRes.unit;
-			var wind = windRes.value + ' ' + windRes.unit;
+			var altRes = convertLength(d['h'], units.altitude);
+			var tempRes = convertTemperature(d['t'], units.temperature);
+			var presRes = convertPressure(d['p'], units.pressure);
+			var windRes = convertSpeed(d['ws'], units.speed);
+			var alt = altRes + ' ' + units.altitude;
+			var temp = tempRes + ' ' + units.temperature;
+			var pres = presRes + ' ' + units.pressure;
+			var wind = windRes + ' ' + units.speed;
 			focus.select('text')
 				.text(alt + ' ' + temp + ' ' + pres + ' ' + wind);
 		}
