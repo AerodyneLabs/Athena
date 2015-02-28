@@ -40,35 +40,45 @@
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 						{{fa-icon "cog"}} <span class="caret"></span>
 					</a>
-					<div class="dropdown-menu" role="menu">
-						<form>
-							<fieldset>
-								<div class="form-group">
-									<label for="altitudeUnits">Altitude</label>
+					<div class="dropdown-menu settings-menu" role="menu">
+						<div class="form-horizontal">
+							<div class="form-group form-group-sm">
+								<label class="col-sm-6 control-label" for="altitudeUnits">Altitude</label>
+								<div class="col-sm-6">
 									{{view "select" elementId="altitudeUnits" content=unitOptions.altitude value=units.altitude class="form-control"}}
 								</div>
-								<div class="form-group">
-									<label for="distanceUnits">Distance</label>
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="col-sm-6 control-label" for="distanceUnits">Distance</label>
+								<div class="col-sm-6">
 									{{view "select" elementId="distanceUnits" content=unitOptions.distance value=units.distance class="form-control"}}
 								</div>
-								<div class="form-group">
-									<label for="lengthUnits">Length</label>
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="col-sm-6 control-label" for="lengthUnits">Length</label>
+								<div class="col-sm-6">
 									{{view "select" elementId="lengthUnits" content=unitOptions.length value=units.length class="form-control"}}
 								</div>
-								<div class="form-group">
-									<label for="massUnits">Mass</label>
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="col-sm-6 control-label" for="massUnits">Mass</label>
+								<div class="col-sm-6">
 									{{view "select" elementId="massUnits" content=unitOptions.mass value=units.mass class="form-control"}}
 								</div>
-								<div class="form-group">
-									<label for="speedUnits">Speed</label>
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="col-sm-6 control-label" for="speedUnits">Speed</label>
+								<div class="col-sm-6">
 									{{view "select" elementId="speedUnits" content=unitOptions.speed value=units.speed class="form-control"}}
 								</div>
-								<div class="form-group">
-									<label for="temperatureUnits">Temperature</label>
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="col-sm-6 control-label" for="temperatureUnits">Temperature</label>
+								<div class="col-sm-6">
 									{{view "select" elementId="temperatureUnits" content=unitOptions.temperature value=units.temperature class="form-control"}}
 								</div>
-							</fieldset>
-						</form>
+							</div>
+						</div>
 					</div>
 				</li>
 			</ul>
