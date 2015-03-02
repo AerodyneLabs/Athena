@@ -49,6 +49,12 @@
 								</div>
 							</div>
 							<div class="form-group form-group-sm">
+								<label class="col-sm-6 control-label" for="coordinateUnits">Coodinates</label>
+								<div class="col-sm-6">
+									{{view "select" elementId="coordinateUnits" content=unitOptions.coordinate value=units.coordinate class="form-control"}}
+								</div>
+							</div>
+							<div class="form-group form-group-sm">
 								<label class="col-sm-6 control-label" for="distanceUnits">Distance</label>
 								<div class="col-sm-6">
 									{{view "select" elementId="distanceUnits" content=unitOptions.distance value=units.distance class="form-control"}}

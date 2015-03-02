@@ -9,6 +9,7 @@ import LoginControllerMixin from 'simple-auth/mixins/login-controller-mixin';
 export default Ember.Controller.extend(LoginControllerMixin, {
 	units: {
 		altitude: 'm',
+		coordinate: 'DD',
 		distance: 'km',
 		length: 'cm',
 		mass: 'kg',
@@ -19,6 +20,7 @@ export default Ember.Controller.extend(LoginControllerMixin, {
 
 	unitOptions: {
 		altitude: ['m', 'km', 'ft', 'mi'],
+		coordinate: ['DD', 'DM', 'DMS'],
 		distance: ['km', 'mi', 'nm'],
 		length: ['cm', 'm', 'in', 'ft'],
 		mass: ['kg', 'lb'],
