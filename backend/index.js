@@ -238,8 +238,8 @@ var fetch_sounding = function(time, lat, lon, next) {
 			return;
 		} else {
 			var result = celery.call(
-				'tasks.atmosphere.extract_sounding.extract_sounding',
-				[time, lat, lon]
+				'tasks.atmosphere.extract_sounding.extract_block',
+				[time, lat, lon, 3]
 			);
 			result.once('success', function(data) {
 				if(next) {

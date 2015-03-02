@@ -6,6 +6,79 @@ import numpy as np
 from .helpers import generate_sounding
 
 
+def transform_lon(lon):
+    while lon < 0:
+        lon += 360
+    while lon >= 360:
+        lon -= 360
+    return lon
+
+
+@app.task(base=MongoTask, bind=True)
+def extract_block(self, time, lat, lon, delta):
+    # Convert time if required
+    if not isinstance(time, datetime):
+        time = datetime.strptime(
+            time.split('.')[0],
+            '%Y-%m-%dT%H:%M:%S'
+        )
+
+    # Generate bounds
+    minLat = max(lat - delta, -90)
+    maxLat = min(lat + delta, 90)
+    minLon = lon - delta
+    maxLon = lon + delta
+
+    # Generate lat/lon points
+    lats = np.arange(minLat, maxLat + 1, 1)
+    lons = np.arange(minLon, maxLon + 1, 1)
+    lons = map(transform_lon, lons)
+
+    # Get raw data
+    fs = gridfs.GridFS(extract_block.mongo.atmosphere)
+    grid_out = fs.get_last_version(forecast=time)
+    npz = np.load(grid_out)
+
+    # Get data arrays
+    lat_val = npz['lat']
+    lon_val = npz['lon']
+    u_val = npz['u']
+    v_val = npz['v']
+    t_val = npz['t']
+    h_val = npz['h']
+    p_val = npz['p']
+
+    # Extract information
+    store = extract_block.mongo.atmosphere.forecast
+    ids = []
+    for y in lats:
+        for x in lons:
+            i = len(lat_val) - np.searchsorted(lat_val[::-1], y) - 1
+            j = np.searchsorted(lon_val, x)
+            tLon = lon_val[j]
+            if tLon > 180:
+                tLon -= 360
+            sounding = generate_sounding(
+                analysis=grid_out.analysis,
+                forecast=grid_out.forecast,
+                lat=lat_val[i],
+                lon=tLon,
+                height=h_val[:, i, j],
+                pressure=p_val[:],
+                temperature=t_val[:, i, j],
+                u=u_val[:, i, j],
+                v=v_val[:, i, j]
+            )
+            id = store.update({
+                    'loc.coordinates': [tLon, lat_val[i]]
+                }, sounding,
+                upsert=True
+            )
+            ids.append(str(id))
+
+    return ids
+
+
 @app.task(base=MongoTask, bind=True)
 def extract_sounding(self, forecast_time, lat, lon):
     """Extract a given sounding from the database and save it."""
