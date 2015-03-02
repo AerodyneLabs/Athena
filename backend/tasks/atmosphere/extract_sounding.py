@@ -70,7 +70,8 @@ def extract_block(self, time, lat, lon, delta):
                 v=v_val[:, i, j]
             )
             id = store.update({
-                    'loc.coordinates': [tLon, lat_val[i]]
+                    'loc.coordinates': [tLon, lat_val[i]],
+                    'forecast': grid_out.forecast
                 }, sounding,
                 upsert=True
             )
