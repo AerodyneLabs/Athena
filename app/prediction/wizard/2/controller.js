@@ -14,6 +14,12 @@ export default Ember.Controller.extend({
     'Kaymont 3000g'
   ],
   balloon: '',
+  gases: ['Helium', 'Hydrogen'],
+  gas: 'Helium',
+  payloadMass: 1.0,
+  liftInput: '',
+  rateInput: '',
+  altitudeInput: '',
   needs: ['application', 'prediction/wizard'],
   units: Ember.computed.alias('controllers.application.units'),
   actions: {
@@ -23,5 +29,24 @@ export default Ember.Controller.extend({
     next: function() {
       this.transitionToRoute('prediction.wizard.3');
     }
+  },
+  update: function() {
+    Ember.run.once(this, 'compute');
+  }.observes(
+    'balloon',
+    'gas',
+    'payloadMass',
+    'liftInput',
+    'rateInput',
+    'altitudeInput',
+    'units.altitude',
+    'units.mass',
+    'units.speed'
+  ),
+  compute: function() {
+    var lift = Number(this.get('liftInput'));
+    var rate = Number(this.get('rateInput'));
+    var alt = Number(this.get('altitudeInput'));
+    console.log(lift, rate, alt);
   }
 });

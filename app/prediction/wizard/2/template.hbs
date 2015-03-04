@@ -1,62 +1,50 @@
 <h2>Balloon and Payload</h2>
 <div class="row">
-  <div class="col-md-4">
-    <form class="form-horizontal">
-      <div class="form-group">
-        <label class="col-md-4 control-label">Gas Type</label>
-        <div class="col-md-4">
-          <label class="radio-inline">
-            <input type="radio" name="gasType" id="hydrogen" value="hydrogen">
-            Hydrogen
-          </label>
+  <div class="col-md-5">
+    <form>
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="gasSelect" class="col-md-4 control-label">Gas Type</label>
+          <div class="col-md-8">
+            {{view "select" elementId="gasSelect" content=gases value=gas class="form-control"}}
+          </div>
         </div>
-        <div class="col-md-4">
-          <label class="radio-inline">
-            <input type="radio" name="gasType" id="helium" value="helium">
-            Helium
-          </label>
+        <div class="form-group">
+          <label for="balloonSelect" class="col-md-4 control-label">Balloon</label>
+          <div class="col-md-8">
+            {{view "select" elementId="balloonSelect" content=balloons class="form-control" value=balloon}}
+          </div>
         </div>
-      </div>
-      <div class="form-group">
-        <label for="balloonSelect" class="col-md-4 control-label">Balloon</label>
-        <div class="col-md-8">
-          {{view "select" elementId="balloonSelect" content=balloons class="form-control" value=balloon}}
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="payloadMass" class="col-md-4 control-label">Payload Mass</label>
-        <div class="col-md-8">
-          <div class="input-group">
-            {{input elementId="payloadMass" value=payloadMass class="form-control"}}
-            <span class="input-group-addon">{{units.mass}}</span>
+        <div class="form-group">
+          <label for="payloadMass" class="col-md-4 control-label">Payload Mass</label>
+          <div class="col-md-8">
+            <div class="input-group">
+              {{input elementId="payloadMass" value=payloadMass class="form-control"}}
+              <span class="input-group-addon">{{units.mass}}</span>
+            </div>
           </div>
         </div>
       </div>
       <div class="form-group">
-        <label for="netLift" class="col-md-4 control-label">Net Lift</label>
-        <div class="col-md-8">
+        <p>Choose one</p>
+        <div class="form-group col-sm-4">
+          <label for="netLift" class="control-label">Net Lift</label>
           <div class="input-group">
-            {{input elementId="netLift" value=payloadMass class="form-control"}}
+            {{input elementId="netLift" value=liftInput class="form-control"}}
             <span class="input-group-addon">{{units.mass}}</span>
           </div>
         </div>
-      </div>
-      <p class="text-center">or</p>
-      <div class="form-group">
-        <label for="ascentRate" class="col-md-4 control-label">Ascent Rate</label>
-        <div class="col-md-8">
+        <div class="form-group col-sm-4">
+          <label for="ascentRate" class="control-label">Ascent Rate</label>
           <div class="input-group">
-            {{input elementId="ascentRate" value=ascentRate class="form-control"}}
+            {{input elementId="ascentRate" value=rateInput class="form-control"}}
             <span class="input-group-addon">{{units.speed}}</span>
           </div>
         </div>
-      </div>
-      <p class="text-center">or</p>
-      <div class="form-group">
-        <label for="targetAltitude" class="col-md-4 control-label">Target Altitude</label>
-        <div class="col-md-8">
+        <div class="form-group col-sm-4">
+          <label for="targetAltitude" class="control-label">Target Altitude</label>
           <div class="input-group">
-            {{input elementId="targetAltitude" value=targetAltitude class="form-control"}}
+            {{input elementId="targetAltitude" value=altitudeInput class="form-control"}}
             <span class="input-group-addon">{{units.altitude}}</span>
           </div>
         </div>
@@ -67,7 +55,7 @@
       </div>
     </form>
   </div>
-  <div class="col-md-8">
+  <div class="col-md-7">
     Graph
   </div>
 </div>
