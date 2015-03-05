@@ -1,15 +1,27 @@
 import Ember from 'ember';
 
-export function convertTemperature(value, unit) {
+export function convertTemperature(value, unit, inverse) {
   var val = Number(value);
   if(unit === 'K') {
     return val;
   } else if(unit === 'C') {
-    return val - 273.15;
+    if(inverse) {
+      return val + 273.15;
+    } else {
+      return val - 273.15;
+    }
   } else if(unit === 'R') {
-    return val * 1.8;
+    if(inverse) {
+      return val / 1.8;
+    } else {
+      return val * 1.8;
+    }
   } else if(unit === 'F') {
-    return (value * 1.8) - 459.67;
+    if(inverse) {
+      return (value + 459.67) / 1.8;
+    } else {
+      return (value * 1.8) - 459.67;
+    }
   } else {
     return NaN;
   }

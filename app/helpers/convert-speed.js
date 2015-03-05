@@ -8,8 +8,11 @@ var speedFactors = {
   kts: 1.94384
 };
 
-export function convertSpeed(value, unit) {
+export function convertSpeed(value, unit, inverse) {
   var factor = speedFactors[unit] || NaN;
+  if(inverse) {
+    factor = 1.0 / factor;
+  }
   return Number(value) * factor;
 }
 

@@ -10,8 +10,11 @@ var lengthFactors = {
   nm: 0.000539957
 };
 
-export function convertLength(value, unit) {
+export function convertLength(value, unit, inverse) {
   var factor = lengthFactors[unit] || NaN;
+  if(inverse) {
+    factor = 1.0 / factor;
+  }
   return Number(value) * factor;
 }
 

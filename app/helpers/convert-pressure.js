@@ -9,8 +9,11 @@ var pressureFactors = {
   Psi: 0.000145037738
 };
 
-export function convertPressure(value, unit) {
+export function convertPressure(value, unit, inverse) {
   var factor = pressureFactors[unit] || NaN;
+  if(inverse) {
+    factor = 1.0 / factor;
+  }
   return Number(value) * factor;
 }
 
