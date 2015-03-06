@@ -10,6 +10,8 @@ var celery = require('node-celery').createClient({
 	CELERY_TASK_RESULT_EXPIRES: 3600
 });
 
+var googleClientId = process.env.GOOGLE_CLIENT_ID;
+
 var server = restify.createServer();
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
@@ -21,6 +23,28 @@ server.get('api/version', function version(req, res, next) {
 		version: '0.0.1'
 	});
 	return next();
+});
+
+server.get('api/validate', function(req, res, next) {
+	request.get({
+		uri: 'https://www.googleapis.com/oauth2/v1/tokeninfo',
+		qs: {
+			access_token: req.params.access_token
+		}
+	}, function(error, response, body) {
+		if(error) return next(error);
+
+		var resp = JSON.parse(body);
+		if(resp.audience === googleClientId) {
+			res.send({
+				access_token: req.params.access_token,
+				email: resp.email,
+				expires: resp.expires_in
+			});
+		} else {
+			return next('Token invalid!');
+		}
+	});
 });
 
 server.get('api/forecastPeriods', function(req, res, next) {
