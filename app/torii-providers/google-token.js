@@ -43,11 +43,11 @@ var GoogleToken = Oauth2Bearer.extend({
         "these required response params: " + responseParams.join(', ');
       }
 
-      return Ember.$.get("https://www.googleapis.com/plus/v1/people/me", {access_token: authData.token}).then(function(user){
+      return Ember.$.get('api/validate', {access_token: authData.token}).then(function(data) {
         return {
-          access_token: authData.token,
-          userName: user.displayName,
-          userEmail: user.emails[0].value,
+          access_token: data.access_token,
+          userEmail: data.email,
+          expires: data.expires,
           provider: name,
           redirectUri: redirectUri
         };
