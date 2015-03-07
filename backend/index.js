@@ -179,7 +179,7 @@ server.get('api/towers/:id', function(req, res, next) {
 	store.findById(req.params.id, function(err, doc) {
 		if(err) return next(err);
 
-		res.send({'center': doc});
+		res.send({'tower': doc});
 		return next();
 	});
 });
