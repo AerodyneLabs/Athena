@@ -23,6 +23,11 @@ Router.map(function() {
     path: '/center/:id'
   });
 
+  this.route('towers');
+  this.route('tower', {
+    path: '/tower/:id'
+  });
+
   this.route('flights');
   this.route('flight', {
     path: '/flight/:id'

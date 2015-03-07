@@ -1,0 +1,12 @@
+<div class="page-header">
+  <h1>Towers</h1>
+</div>
+<ul>
+  {{#each tower in model}}
+  <li>
+    {{#link-to 'tower' tower.id}}
+    {{tower.id}} - {{tower.properties.name}}
+    {{/link-to}}
+  </li>
+  {{/each}}
+</ul>
