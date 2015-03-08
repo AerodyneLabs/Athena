@@ -35,7 +35,6 @@ export default Ember.Controller.extend({
     }
   },
   inputUnit: function() {
-    console.log('inputUnit');
     var type = this.get('inputType');
     if(type === 'Ascent Rate') {
       return this.get('units.speed');
