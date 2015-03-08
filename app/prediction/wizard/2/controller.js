@@ -17,9 +17,13 @@ export default Ember.Controller.extend({
   gases: ['Helium', 'Hydrogen'],
   gas: 'Helium',
   payloadMass: 1.0,
-  liftInput: '',
-  rateInput: '',
-  altitudeInput: '',
+  inputOptions: [
+    'Ascent Rate',
+    'Target Altitude',
+    'Net Lift'
+  ],
+  inputType: 'Ascent Rate',
+  inputValue: '',
   needs: ['application', 'prediction/wizard'],
   units: Ember.computed.alias('controllers.application.units'),
   actions: {
@@ -30,23 +34,17 @@ export default Ember.Controller.extend({
       this.transitionToRoute('prediction.wizard.3');
     }
   },
-  update: function() {
-    Ember.run.once(this, 'compute');
-  }.observes(
-    'balloon',
-    'gas',
-    'payloadMass',
-    'liftInput',
-    'rateInput',
-    'altitudeInput',
-    'units.altitude',
-    'units.mass',
-    'units.speed'
-  ),
-  compute: function() {
-    var lift = Number(this.get('liftInput'));
-    var rate = Number(this.get('rateInput'));
-    var alt = Number(this.get('altitudeInput'));
-    console.log(lift, rate, alt);
-  }
+  inputUnit: function() {
+    console.log('inputUnit');
+    var type = this.get('inputType');
+    if(type === 'Ascent Rate') {
+      return this.get('units.speed');
+    } else if(type === 'Target Altitude') {
+      return this.get('units.altitude');
+    } else if(type === 'Net Lift') {
+      return this.get('units.mass');
+    } else {
+      return '?';
+    }
+  }.property('inputType')
 });
