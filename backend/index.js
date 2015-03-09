@@ -1,8 +1,6 @@
 var restify = require('restify');
 var socketio = require('socket.io');
-var monk = require('monk')('localhost/atmosphere');
-var airspace = require('monk')('localhost/airspace');
-var flights = require('monk')('localhost/flights');
+var monk = require('monk');
 var request = require('request');
 var celery = require('node-celery').createClient({
 	CELERY_BROKER_URL: 'amqp://guest:guest@localhost:5672',
@@ -10,7 +8,14 @@ var celery = require('node-celery').createClient({
 	CELERY_TASK_RESULT_EXPIRES: 3600
 });
 
+// Get environment variables
 var googleClientId = process.env.GOOGLE_CLIENT_ID;
+var mapquestApiKey = process.env.MAPQUEST_API_KEY;
+
+// Get database collections
+var atmosphere = monk('localhost/atmosphere');
+var airspace = monk('localhost/airspace');
+var flights = monk('localhost/flights');
 
 var server = restify.createServer();
 server.use(restify.queryParser());
@@ -48,7 +53,7 @@ server.get('api/validate', function(req, res, next) {
 });
 
 server.get('api/forecastPeriods', function(req, res, next) {
-	var store = monk.get('fs.files');
+	var store = atmosphere.get('fs.files');
 	store.find({}, '-chunkSize -md5', function(err, docs) {
 		if(err) return next(err);
 
@@ -58,7 +63,7 @@ server.get('api/forecastPeriods', function(req, res, next) {
 });
 
 server.get('api/forecastPeriods/:id', function(req, res, next) {
-	var store = monk.get('fs.files');
+	var store = atmosphere.get('fs.files');
 	store.findById(req.params.id, '-chunkSize -md5', function(err, doc) {
 		if(err) return next(err);
 
@@ -240,7 +245,7 @@ server.get('api/centers/:id', function(req, res, next) {
 });
 
 server.get('api/soundings', function(req, res, next) {
-	var store = monk.get('forecast');
+	var store = atmosphere.get('forecast');
 	store.find({}, function(err, docs) {
 		if(err) return next(err);
 
@@ -250,7 +255,7 @@ server.get('api/soundings', function(req, res, next) {
 });
 
 var fetch_sounding = function(time, lat, lon, next) {
-	var store = monk.get('forecast');
+	var store = atmosphere.get('forecast');
 	store.findOne({
 		'forecast': time,
 		'loc.coordinates': [lon, lat]
@@ -284,7 +289,7 @@ var fetch_sounding = function(time, lat, lon, next) {
 };
 
 server.get('api/soundings/:id', function(req, res, next) {
-	var store = monk.get('forecast');
+	var store = atmosphere.get('forecast');
 	store.findById(req.params.id, function(err, doc) {
 		if(err) return next(err);
 
@@ -294,7 +299,7 @@ server.get('api/soundings/:id', function(req, res, next) {
 });
 
 server.post('api/soundings/prefetch', function(req, res, next) {
-	var store = monk.get('fs.files');
+	var store = atmosphere.get('fs.files');
 	if(req.params.near) {
 		try {
 			var coords = JSON.parse(req.params.near);
@@ -337,7 +342,7 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 	var time = new Date(Number(req.params.timestamp) * 1000);
 	var lat = Number(req.params.latitude);
 	var lon = Number(req.params.longitude);
-	var store = monk.get('forecast');
+	var store = atmosphere.get('forecast');
 	store.findOne({
 		'forecast': time,
 		'loc.coordinates':[lon, lat]
@@ -411,7 +416,7 @@ server.get('api/navaids/:id', function(req, res, next) {
 
 server.get('api/geo/address', function(req, res, next) {
 	var baseUrl = 'http://open.mapquestapi.com/geocoding/v1/address';
-	var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
+	var url = baseUrl + '?key=' + mapquestApiKey;
 	request.post({
 		uri: url,
 		json: true,
@@ -424,7 +429,7 @@ server.get('api/geo/address', function(req, res, next) {
 		}
 	}, function(error, response, body) {
 		if(error) return next(error);
-		
+
 		var loc = body.results[0].locations[0];
 		res.send({'location': {
 			'type': 'Point',
@@ -436,7 +441,7 @@ server.get('api/geo/address', function(req, res, next) {
 
 server.get('api/geo/reverse', function(req, res, next) {
 	var baseUrl = 'http://open.mapquestapi.com/geocoding/v1/reverse';
-	var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
+	var url = baseUrl + '?key=' + mapquestApiKey;
 	var coords = JSON.parse(req.query.location);
 	request.post({
 		uri: url,
@@ -470,7 +475,7 @@ server.get('api/geo/reverse', function(req, res, next) {
 
 server.get('api/geo/altitude', function(req, res, next) {
 	var baseUrl = 'http://open.mapquestapi.com/elevation/v1/profile';
-	var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
+	var url = baseUrl + '?key=' + mapquestApiKey;
 	var coords = JSON.parse(req.query.location);
 	var latlngs = [];
 	coords.forEach(function(x) {
