@@ -161,10 +161,26 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 // Get many sounding records
 server.get('api/soundings', function(req, res, next) {
 	var store = atmosphere.get('forecast');
+	var limit = req.query.limit || 25;
+	var skip = req.query.offest || 0;
+	var query = {};
+
+	var total = 0;
+	store.count(query, function(err, counts) {
+		if(err) return next(err);
+		total = count;
+	});
 	store.find({}, function(err, docs) {
 		if(err) return next(err);
 
-		res.send({'soundings':docs});
+		res.send({
+			'soundings': docs,
+			'meta': {
+				'total': total,
+				'offset': skip,
+				'limit': limit
+			}
+		});
 		return next();
 	});
 });
