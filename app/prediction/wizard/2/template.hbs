@@ -3,19 +3,19 @@
   <div class="col-md-5">
     <form>
       <div class="form-horizontal">
-        <div class="form-group">
+        <div {{bind-attr class=":form-group gasTypeError:has-error"}}>
           <label for="gasSelect" class="col-md-3 control-label">Gas Type</label>
           <div class="col-md-9">
             {{view "select" elementId="gasSelect" content=gases value=gas class="form-control"}}
           </div>
         </div>
-        <div class="form-group">
+        <div {{bind-attr class=":form-group balloonError:has-error"}}>
           <label for="balloonSelect" class="col-md-3 control-label">Balloon</label>
           <div class="col-md-9">
             {{view "select" elementId="balloonSelect" content=balloons class="form-control" value=balloon}}
           </div>
         </div>
-        <div class="form-group">
+        <div {{bind-attr class=":form-group payloadMassError:has-error"}}>
           <label for="payloadMass" class="col-md-3 control-label">Payload Mass</label>
           <div class="col-md-9">
             <div class="input-group">
@@ -24,7 +24,7 @@
             </div>
           </div>
         </div>
-        <div class="form-group">
+        <div {{bind-attr class=":form-group inputValueError:has-error"}}>
           <label for="inputSelect" class="col-md-3 control-label">Parameter</label>
           <div class="col-md-5">
             {{view "select" elementId="inputSelect" content=inputOptions value=inputType class="form-control"}}

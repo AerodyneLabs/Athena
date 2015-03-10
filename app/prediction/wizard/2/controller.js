@@ -24,6 +24,10 @@ export default Ember.Controller.extend({
   ],
   inputType: 'Ascent Rate',
   inputValue: '',
+  gasTypeError: false,
+  balloonError: false,
+  payloadMassError: false,
+  inputValueError: false,
   needs: ['application', 'prediction/wizard'],
   units: Ember.computed.alias('controllers.application.units'),
   actions: {
@@ -31,7 +35,9 @@ export default Ember.Controller.extend({
       this.transitionToRoute('prediction.wizard.1');
     },
     next: function() {
-      this.transitionToRoute('prediction.wizard.3');
+      if(this.validate()) {
+        this.transitionToRoute('prediction.wizard.3');
+      }
     }
   },
   inputUnit: function() {
@@ -45,5 +51,46 @@ export default Ember.Controller.extend({
     } else {
       return '?';
     }
-  }.property('inputType')
+  }.property('inputType'),
+  validate: function() {
+    var valid = true;
+
+    var gases = this.get('gases');
+    var gas = this.get('gas');
+    if(gases.indexOf(gas) < 0) {
+      valid = false;
+      this.set('gasTypeError', true);
+    } else {
+      this.set('gasTypeError', false);
+    }
+
+    var balloons = this.get('balloons');
+    var balloon = this.get('balloon');
+    if(balloons.indexOf(balloon) < 0) {
+      valid = false;
+      this.set('balloonError', true);
+    } else {
+      this.set('balloonError', false);
+    }
+
+    var mass = parseFloat(this.get('payloadMass'));
+    if(isNaN(mass) || mass <= 0) {
+      valid = false;
+      this.set('payloadMassError', true);
+    } else {
+      this.set('payloadMassError', false);
+    }
+
+    var types = this.get('inputOptions');
+    var type = this.get('inputType');
+    var value = parseFloat(this.get('inputValue'));
+    if(types.indexOf(type) < 0 || isNaN(value) || value <= 0) {
+      valid = false;
+      this.set('inputValueError', true);
+    } else {
+      this.set('inputValueError', false);
+    }
+
+    return valid;
+  }
 });
