@@ -27,21 +27,21 @@ export default Ember.Component.extend({
       pages.push({key: i, classes: classes});
     }
     return pages;
-  }.property(),
+  }.property('pageCount', 'currentPage'),
   first: function() {
     if(this.get('currentPage') <= 1) {
       return true;
     } else {
       return false;
     }
-  }.property(),
+  }.property('pageCount', 'currentPage'),
   last: function() {
     if(this.get('currentPage') >= this.get('pageCount')) {
       return true;
     } else {
       return false;
     }
-  }.property(),
+  }.property('pageCount', 'currentPage'),
   actions: {
     prev: function() {
       var curPage = this.get('currentPage');
