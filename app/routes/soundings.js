@@ -1,17 +1,12 @@
-import Ember from 'ember';
+import PaginationBase from 'athena/routes/pagination-base';
 
 /**
  * A route to display a list of all soundings
  * @class SoundingsRoute
- * @extends Ember.Route
+ * @extends PaginationBase
  */
-export default Ember.Route.extend({
-	/**
-	 * Set the model for the soundings route
-	 * @method model
-	 * @return {Promise} A promise that will resolve to an array of sounding models
-	 */
-	model: function() {
-		return this.store.find('sounding');
+export default PaginationBase.extend({
+	init: function() {
+		this._super('sounding');
 	}
 });
