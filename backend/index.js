@@ -1,8 +1,6 @@
 var restify = require('restify');
 var socketio = require('socket.io');
-var monk = require('monk')('localhost/atmosphere');
-var airspace = require('monk')('localhost/airspace');
-var flights = require('monk')('localhost/flights');
+var monk = require('monk');
 var request = require('request');
 var celery = require('node-celery').createClient({
 	CELERY_BROKER_URL: 'amqp://guest:guest@localhost:5672',
@@ -10,7 +8,14 @@ var celery = require('node-celery').createClient({
 	CELERY_TASK_RESULT_EXPIRES: 3600
 });
 
+// Get environment variables
 var googleClientId = process.env.GOOGLE_CLIENT_ID;
+var mapquestApiKey = process.env.MAPQUEST_API_KEY;
+
+// Get database collections
+var atmosphere = monk('localhost/atmosphere');
+var airspace = monk('localhost/airspace');
+var flights = monk('localhost/flights');
 
 var server = restify.createServer();
 server.use(restify.queryParser());
@@ -18,6 +23,9 @@ server.use(restify.bodyParser());
 
 var io = socketio.listen(server);
 
+// Misc routes
+
+// Get the server version
 server.get('api/version', function version(req, res, next) {
 	res.send({
 		version: '0.0.1'
@@ -25,6 +33,7 @@ server.get('api/version', function version(req, res, next) {
 	return next();
 });
 
+// Validate an access token
 server.get('api/validate', function(req, res, next) {
 	request.get({
 		uri: 'https://www.googleapis.com/oauth2/v1/tokeninfo',
@@ -47,26 +56,9 @@ server.get('api/validate', function(req, res, next) {
 	});
 });
 
-server.get('api/forecastPeriods', function(req, res, next) {
-	var store = monk.get('fs.files');
-	store.find({}, '-chunkSize -md5', function(err, docs) {
-		if(err) return next(err);
+// Prediction/flight routes
 
-		res.send({'forecastPeriods':docs});
-		return next();
-	});
-});
-
-server.get('api/forecastPeriods/:id', function(req, res, next) {
-	var store = monk.get('fs.files');
-	store.findById(req.params.id, '-chunkSize -md5', function(err, doc) {
-		if(err) return next(err);
-
-		res.send({'forecastPeriod':doc});
-		return next();
-	});
-});
-
+// Get many prediction records
 server.get('api/predictions', function(req, res, next) {
 	var store = flights.get('predictions');
 	store.find({}, function(err, docs) {
@@ -77,6 +69,7 @@ server.get('api/predictions', function(req, res, next) {
 	});
 });
 
+// Get specified prediction record
 server.get('api/predictions/:id', function(req, res, next) {
 	var store = flights.get('predictions');
 	store.findById(req.params.id, function(err, doc) {
@@ -87,6 +80,7 @@ server.get('api/predictions/:id', function(req, res, next) {
 	});
 });
 
+// Create a new prediction
 server.post('api/predictions', function(req, res, next) {
 	var store = flights.get('predictions');
 	var params = req.params.prediction;
@@ -107,6 +101,7 @@ server.post('api/predictions', function(req, res, next) {
 	});
 });
 
+// Get many flight records
 server.get('api/flights', function(req, res, next) {
 	var store = flights.get('flights');
 	var query = {};
@@ -127,6 +122,7 @@ server.get('api/flights', function(req, res, next) {
 	});
 });
 
+// Get specified flight record
 server.get('api/flights/:id', function(req, res, next) {
 	var store = flights.get('flights');
 	store.findById(req.params.id, function(err, doc) {
@@ -137,120 +133,72 @@ server.get('api/flights/:id', function(req, res, next) {
 	});
 });
 
-server.get('api/towers', function(req, res, next) {
-	var store = airspace.get('tower');
-	var limit = req.query.limit || 25;
-	var skip = req.query.skip || 0;
-	var query = {};
-	if(req.query.near) {
-		var coords = JSON.parse(req.query.near);
-		query = {
-			geometry: {
-				$near: {
-					$geometry: {
-						type: 'Point',
-						coordinates: coords
-					}
-				}
-			}
-		};
-	}
-	if(req.query.within) {
-		var coords = JSON.parse(req.query.within);
-		query = {
-			geometry: {
-				$geoWithin: {
-					$box: coords
-				}
-			}
-		};
-	}
-	store.find(query, {limit: limit, skip: skip}, function(err, docs) {
+
+// Atmosphere routes
+
+// Get many forecastPeriod records
+server.get('api/forecastPeriods', function(req, res, next) {
+	var store = atmosphere.get('fs.files');
+	store.find({}, '-chunkSize -md5', function(err, docs) {
 		if(err) return next(err);
 
-		res.send({'towers': docs});
+		res.send({'forecastPeriods':docs});
 		return next();
 	});
 });
 
-server.get('api/towers/:id', function(req, res, next) {
-	var store = airspace.get('tower');
-	store.id = function(str) {return str;};
-	store.findById(req.params.id, function(err, doc) {
+// Get specified forecastPeriod record
+server.get('api/forecastPeriods/:id', function(req, res, next) {
+	var store = atmosphere.get('fs.files');
+	store.findById(req.params.id, '-chunkSize -md5', function(err, doc) {
 		if(err) return next(err);
 
-		res.send({'tower': doc});
+		res.send({'forecastPeriod':doc});
 		return next();
 	});
 });
 
-server.get('api/centers', function(req, res, next) {
-	var store = airspace.get('artcc');
-	var query = {};
-	if(req.query.near) {
-		var coords = JSON.parse(req.query.near);
-		query = {
-			geometry: {
-				$geoIntersects: {
-					$geometry: {
-						type: 'Point',
-						coordinates: coords
-					}
-				}
-			}
-		};
-	}
-	if(req.query.within) {
-		var coords = JSON.parse(req.query.within);
-		var box = [
-			coords[0],
-			[coords[1][0], coords[0][1]],
-			coords[1],
-			[coords[0][0], coords[1][1]],
-			coords[0]
-		];
-		query = {
-			geometry: {
-				$geoIntersects: {
-					$geometry: {
-						type: 'Polygon',
-						coordinates: [box]
-					}
-				}
-			}
-		};
-	}
-	store.find(query, function(err, docs) {
-		if(err) return next(err);
-
-		res.send({'centers': docs});
-		return next();
-	});
-});
-
-server.get('api/centers/:id', function(req, res, next) {
-	var store = airspace.get('artcc');
-	store.id = function(str) {return str;};
-	store.findById(req.params.id, function(err, doc) {
-		if(err) return next(err);
-
-		res.send({'center': doc});
-		return next();
-	});
-});
-
+// Get many sounding records
 server.get('api/soundings', function(req, res, next) {
-	var store = monk.get('forecast');
-	store.find({}, function(err, docs) {
+	var store = atmosphere.get('forecast');
+	var limit = req.query.limit || 25;
+	var skip = req.query.offset || 0;
+	var query = {};
+
+	var total = 0;
+	store.count(query, function(err, count) {
+		if(err) return next(err);
+		total = count;
+	});
+	store.find({}, {limit: limit, skip: skip}, function(err, docs) {
 		if(err) return next(err);
 
-		res.send({'soundings':docs});
+		res.send({
+			'soundings': docs,
+			'meta': {
+				'total': total,
+				'offset': skip,
+				'limit': limit
+			}
+		});
 		return next();
 	});
 });
 
+// Get specified sounding record
+server.get('api/soundings/:id', function(req, res, next) {
+	var store = atmosphere.get('forecast');
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'sounding':doc});
+		return next();
+	});
+});
+
+// Extract soundings from compressed files
 var fetch_sounding = function(time, lat, lon, next) {
-	var store = monk.get('forecast');
+	var store = atmosphere.get('forecast');
 	store.findOne({
 		'forecast': time,
 		'loc.coordinates': [lon, lat]
@@ -283,18 +231,9 @@ var fetch_sounding = function(time, lat, lon, next) {
 	});
 };
 
-server.get('api/soundings/:id', function(req, res, next) {
-	var store = monk.get('forecast');
-	store.findById(req.params.id, function(err, doc) {
-		if(err) return next(err);
-
-		res.send({'sounding':doc});
-		return next();
-	});
-});
-
+// Prefetch all soundings near a point
 server.post('api/soundings/prefetch', function(req, res, next) {
-	var store = monk.get('fs.files');
+	var store = atmosphere.get('fs.files');
 	if(req.params.near) {
 		try {
 			var coords = JSON.parse(req.params.near);
@@ -337,7 +276,7 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 	var time = new Date(Number(req.params.timestamp) * 1000);
 	var lat = Number(req.params.latitude);
 	var lon = Number(req.params.longitude);
-	var store = monk.get('forecast');
+	var store = atmosphere.get('forecast');
 	store.findOne({
 		'forecast': time,
 		'loc.coordinates':[lon, lat]
@@ -362,56 +301,13 @@ server.get('api/sounding/:timestamp/:latitude/:longitude', function(req, res, ne
 	});
 });
 
-server.get('api/navaids', function(req, res, next) {
-	var store = airspace.get('navaid');
-	var limit = req.query.limit || 25;
-	var skip = req.query.skip || 0;
-	var query = {};
-	if(req.query.near) {
-		var coords = JSON.parse(req.query.near);
-		query = {
-			geometry: {
-				$near: {
-					$geometry: {
-						type: 'Point',
-						coordinates: coords
-					}
-				}
-			}
-		};
-	}
-	if(req.query.within) {
-		var coords = JSON.parse(req.query.within);
-		query = {
-			geometry: {
-				$geoWithin: {
-					$box: coords
-				}
-			}
-		};
-	}
-	store.find(query, {limit: limit, skip: skip}, function(err, docs) {
-		if(err) return next(err);
 
-		res.send({'navaids': docs});
-		return next();
-	});
-});
+// Geocoding routes
 
-server.get('api/navaids/:id', function(req, res, next) {
-	var store = airspace.get('navaid');
-	store.id = function(str) {return str;};
-	store.findById(req.params.id, function(err, doc) {
-		if(err) return next(err);
-
-		res.send({'navaid': doc});
-		return next();
-	});
-});
-
+// Get a point from an address
 server.get('api/geo/address', function(req, res, next) {
 	var baseUrl = 'http://open.mapquestapi.com/geocoding/v1/address';
-	var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
+	var url = baseUrl + '?key=' + mapquestApiKey;
 	request.post({
 		uri: url,
 		json: true,
@@ -424,7 +320,7 @@ server.get('api/geo/address', function(req, res, next) {
 		}
 	}, function(error, response, body) {
 		if(error) return next(error);
-		
+
 		var loc = body.results[0].locations[0];
 		res.send({'location': {
 			'type': 'Point',
@@ -434,9 +330,10 @@ server.get('api/geo/address', function(req, res, next) {
 	});
 });
 
+// Get an address from a point
 server.get('api/geo/reverse', function(req, res, next) {
 	var baseUrl = 'http://open.mapquestapi.com/geocoding/v1/reverse';
-	var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
+	var url = baseUrl + '?key=' + mapquestApiKey;
 	var coords = JSON.parse(req.query.location);
 	request.post({
 		uri: url,
@@ -468,9 +365,10 @@ server.get('api/geo/reverse', function(req, res, next) {
 	});
 });
 
+// Get ground level altitude
 server.get('api/geo/altitude', function(req, res, next) {
 	var baseUrl = 'http://open.mapquestapi.com/elevation/v1/profile';
-	var url = baseUrl + '?key=' + process.env.MAPQUEST_API_KEY;
+	var url = baseUrl + '?key=' + mapquestApiKey;
 	var coords = JSON.parse(req.query.location);
 	var latlngs = [];
 	coords.forEach(function(x) {
@@ -499,40 +397,190 @@ server.get('api/geo/altitude', function(req, res, next) {
 	});
 });
 
-server.get('api/airspaces/:lat1/:lon1/:lat2/:lon2', function(req, res, next) {
-	var lat1 = Number(req.params.lat1);
-	var lon1 = Number(req.params.lon1);
-	var lat2 = Number(req.params.lat2);
-	var lon2 = Number(req.params.lon2);
-	var store = airspace.get('airspaces');
-	store.find({
-		'bounds': {
-			'$geoIntersects': {
-				'$geometry': {
-					'type': 'Polygon',
-					'coordinates': [[
-						[lon1, lat1],
-						[lon2, lat1],
-						[lon2, lat2],
-						[lon1, lat2],
-						[lon1, lat1]
-					]]
+
+// Airspace routes
+
+// Get many center records
+server.get('api/centers', function(req, res, next) {
+	var store = airspace.get('artcc');
+	var query = {};
+	if(req.query.near) {
+		var coords = JSON.parse(req.query.near);
+		query = {
+			geometry: {
+				$geoIntersects: {
+					$geometry: {
+						type: 'Point',
+						coordinates: coords
+					}
 				}
 			}
-		}
-	}, function(err, docs) {
-		if(err) {
-			res.send(400, err);
-		} else {
-			var features = {
-				'type': 'FeatureCollection',
-				'features': docs
+		};
+	}
+	if(req.query.within) {
+		var coords = JSON.parse(req.query.within);
+		var box = [
+		coords[0],
+		[coords[1][0], coords[0][1]],
+		coords[1],
+		[coords[0][0], coords[1][1]],
+		coords[0]
+		];
+		query = {
+			geometry: {
+				$geoIntersects: {
+					$geometry: {
+						type: 'Polygon',
+						coordinates: [box]
+					}
+				}
 			}
-			res.send(features);
-		}
+		};
+	}
+	store.find(query, function(err, docs) {
+		if(err) return next(err);
+
+		res.send({'centers': docs});
+		return next();
 	});
 });
 
+// Get a specified center record
+server.get('api/centers/:id', function(req, res, next) {
+	var store = airspace.get('artcc');
+	store.id = function(str) {return str;};
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'center': doc});
+		return next();
+	});
+});
+
+// Get many navaid records
+server.get('api/navaids', function(req, res, next) {
+	var store = airspace.get('navaid');
+	var limit = req.query.limit || 25;
+	var skip = req.query.offset || 0;
+	var query = {};
+	if(req.query.near) {
+		var coords = JSON.parse(req.query.near);
+		query = {
+			geometry: {
+				$near: {
+					$geometry: {
+						type: 'Point',
+						coordinates: coords
+					}
+				}
+			}
+		};
+	}
+	if(req.query.within) {
+		var coords = JSON.parse(req.query.within);
+		query = {
+			geometry: {
+				$geoWithin: {
+					$box: coords
+				}
+			}
+		};
+	}
+	var total = 0;
+	store.count(query, function(err, count) {
+		if(err) return next(err);
+		total = count;
+	});
+	store.find(query, {limit: limit, skip: skip}, function(err, docs) {
+		if(err) return next(err);
+
+		res.send({
+			'navaids': docs,
+			'meta': {
+				'total': total,
+				'offset': skip,
+				'limit': limit
+			}
+		});
+		return next();
+	});
+});
+
+// Get specified navaid record
+server.get('api/navaids/:id', function(req, res, next) {
+	var store = airspace.get('navaid');
+	store.id = function(str) {return str;};
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'navaid': doc});
+		return next();
+	});
+});
+
+// Get many tower records
+server.get('api/towers', function(req, res, next) {
+	var store = airspace.get('tower');
+	var limit = req.query.limit || 25;
+	var skip = req.query.offset || 0;
+	var query = {};
+	if(req.query.near) {
+		var coords = JSON.parse(req.query.near);
+		query = {
+			geometry: {
+				$near: {
+					$geometry: {
+						type: 'Point',
+						coordinates: coords
+					}
+				}
+			}
+		};
+	}
+	if(req.query.within) {
+		var coords = JSON.parse(req.query.within);
+		query = {
+			geometry: {
+				$geoWithin: {
+					$box: coords
+				}
+			}
+		};
+	}
+	var total = 0;
+	store.count(query, function(err, count) {
+		if(err) return next(err);
+		total = count;
+	});
+	store.find(query, {limit: limit, skip: skip}, function(err, docs) {
+		if(err) return next(err);
+
+		res.send({
+			'towers': docs,
+			'meta': {
+				'total': total,
+				'offset': skip,
+				'limit': limit
+			}
+		});
+		return next();
+	});
+});
+
+// Get a specified tower record
+server.get('api/towers/:id', function(req, res, next) {
+	var store = airspace.get('tower');
+	store.id = function(str) {return str;};
+	store.findById(req.params.id, function(err, doc) {
+		if(err) return next(err);
+
+		res.send({'tower': doc});
+		return next();
+	});
+});
+
+
+// Start the server
 server.listen(8080, function() {
 	console.log('%s listening at %s', server.name, server.url);
 });

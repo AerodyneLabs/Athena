@@ -1,7 +1,7 @@
-import Ember from 'ember';
+import PaginationBase from 'athena/routes/pagination-base';
 
-export default Ember.Route.extend({
-  model: function() {
-    return this.store.find('tower');
+export default PaginationBase.extend({
+  init: function() {
+    this._super('tower');
   }
 });
