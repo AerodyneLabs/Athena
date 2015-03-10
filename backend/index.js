@@ -445,7 +445,7 @@ server.get('api/centers/:id', function(req, res, next) {
 server.get('api/navaids', function(req, res, next) {
 	var store = airspace.get('navaid');
 	var limit = req.query.limit || 25;
-	var skip = req.query.skip || 0;
+	var skip = req.query.offset || 0;
 	var query = {};
 	if(req.query.near) {
 		var coords = JSON.parse(req.query.near);
@@ -470,10 +470,22 @@ server.get('api/navaids', function(req, res, next) {
 			}
 		};
 	}
+	var total = 0;
+	store.count(query, function(err, count) {
+		if(err) return next(err);
+		total = count;
+	});
 	store.find(query, {limit: limit, skip: skip}, function(err, docs) {
 		if(err) return next(err);
 
-		res.send({'navaids': docs});
+		res.send({
+			'navaids': docs,
+			'meta': {
+				'total': total,
+				'offset': skip,
+				'limit': limit
+			}
+		});
 		return next();
 	});
 });
