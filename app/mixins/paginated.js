@@ -11,7 +11,7 @@ export default Ember.Mixin.create({
   }.property('total', 'limit'),
   actions: {
     changePage: function(page) {
-      this.transitionToRoute('towers', {queryParams: {page: page}});
+      this.transitionToRoute({queryParams: {page: page}});
     }
   }
 });
