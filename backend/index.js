@@ -162,7 +162,7 @@ server.get('api/forecastPeriods/:id', function(req, res, next) {
 server.get('api/soundings', function(req, res, next) {
 	var store = atmosphere.get('forecast');
 	var limit = req.query.limit || 25;
-	var skip = req.query.offest || 0;
+	var skip = req.query.offset || 0;
 	var query = {};
 
 	var total = 0;
