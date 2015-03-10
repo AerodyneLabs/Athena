@@ -166,11 +166,11 @@ server.get('api/soundings', function(req, res, next) {
 	var query = {};
 
 	var total = 0;
-	store.count(query, function(err, counts) {
+	store.count(query, function(err, count) {
 		if(err) return next(err);
 		total = count;
 	});
-	store.find({}, function(err, docs) {
+	store.find({}, {limit: limit, skip: skip}, function(err, docs) {
 		if(err) return next(err);
 
 		res.send({
