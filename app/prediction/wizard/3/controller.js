@@ -24,6 +24,11 @@ export default Ember.Controller.extend({
   parachuteDrag: 0,
   parachuteRadius: 0,
   parachuteSpillRadius: 0,
+  parachuteError: false,
+  parachuteRadiusError: false,
+  parachuteSpillRadiusError: false,
+  areaError: false,
+  dragError: false,
   isCustom: function() {
     if(this.get('parachute') === 'Custom') {
       return true;
@@ -48,10 +53,29 @@ export default Ember.Controller.extend({
     this.set('parachuteDrag', chuteData.drag);
   }.observes('parachute', 'controllers.application.units.length'),
   computeArea: function() {
+    var valid = true;
     var r1 = this.get('parachuteRadius');
+    if(isNaN(r1) || r1 <= 0) {
+      valid = false;
+      this.set('parachuteRadiusError', true);
+    } else {
+      this.set('parachuteRadiusError', false);
+    }
     var r2 = this.get('parachuteSpillRadius');
-    var area = 3.1415 * ((r1 * r1) - (r2 * r2));
-    this.set('parachuteArea', area);
+    if(isNaN(r2) || r2 < 0) {
+      valid = false;
+      this.set('parachuteSpillRadiusError', true);
+    } else {
+      this.set('parachuteSpillRadiusError', false);
+    }
+    if(valid) {
+      var area = 3.1415 * ((r1 * r1) - (r2 * r2));
+      this.set('parachuteArea', area);
+      this.set('areaError', false);
+    } else {
+      this.set('parachuteArea', 0);
+      this.set('areaError', true);
+    }
   }.observes('parachuteRadius', 'parachuteSpillRadius'),
   needs: ['application', 'prediction/wizard'],
   units: Ember.computed.alias('controllers.application.units'),
@@ -60,7 +84,39 @@ export default Ember.Controller.extend({
       this.transitionToRoute('prediction.wizard.2');
     },
     next: function() {
-      this.transitionToRoute('prediction.wizard.4');
+      if(this.validate()) {
+        this.transitionToRoute('prediction.wizard.4');
+      }
     }
+  },
+  validate: function() {
+    var valid = true;
+
+    var chutes = this.get('parachutes');
+    var chute = this.get('parachute');
+    if(chutes.indexOf(chute) < 0) {
+      valid = false;
+      this.set('parachuteError', true);
+    } else {
+      this.set('parachuteError', false);
+    }
+
+    var area = this.get('parachuteArea');
+    if(isNaN(area) || area <= 0) {
+      valid = false;
+      this.set('areaError', true);
+    } else {
+      this.set('areaError', false);
+    }
+
+    var drag = this.get('parachuteDrag');
+    if(isNaN(drag) || drag <= 0) {
+      valid = false;
+      this.set('dragError', true);
+    } else {
+      this.set('dragError', false);
+    }
+
+    return valid;
   }
 });
