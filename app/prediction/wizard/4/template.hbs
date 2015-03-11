@@ -2,22 +2,11 @@
 <div class="row">
   <div class="col-md-4">
     <form class="form-horizontal">
-      <div class="form-group">
-        <label for="date" class="col-md-4 control-label">Date</label>
+      <div {{bind-attr class=":form-group timeError:has-error"}}>
+        <label for="date" class="col-md-4 control-label">Launch Time</label>
         <div class="col-md-8">
-          <div class="input-group">
-            {{input elementId="date" value=date class="form-control"}}
-            <span class="input-group-addon">{{fa-icon "calendar"}}</span>
-          </div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="time" class="col-md-4 control-label">Time</label>
-        <div class="col-md-8">
-          <div class="input-group">
-            {{input elementId="time" value=time class="form-control"}}
-            <span class="input-group-addon">{{fa-icon "clock-o"}}</span>
-          </div>
+          {{bs-datetimepicker date=time format="YYYY-MM-DD HH:mm" dateIcon="fa fa-calendar"}}
+          <p class="help-block">Local time</p>
         </div>
       </div>
       <div class="panel panel-default">
