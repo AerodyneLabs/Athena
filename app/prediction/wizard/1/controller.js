@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import {convertCoordinate} from 'athena/helpers/convert-coordinate';
 
 export default Ember.Controller.extend({
   searchError: false,
@@ -13,7 +14,7 @@ export default Ember.Controller.extend({
   actions: {
     next: function() {
       var goodLat = false;
-      var lat = this.parseLocation(this.get('latitudeInput'));
+      var lat = convertCoordinate(this.get('latitudeInput'), null, null, true);
       if(isNaN(lat)) {
         this.set('latitudeError', true);
       } else if(lat > 90 || lat < -90) {
@@ -23,7 +24,8 @@ export default Ember.Controller.extend({
         goodLat = true;
       }
       var goodLon = false;
-      var lon = this.parseLocation(this.get('longitudeInput'));
+      var lon = convertCoordinate(this.get('longitudeInput'), null, null, true);
+      console.log(lat, lon);
       if(isNaN(lon)) {
         this.set('longitudeError', true);
       } else if(lon < -180 || lon > 180) {
@@ -60,54 +62,6 @@ export default Ember.Controller.extend({
         controller.set('searchIcon', 'search');
       });
     }
-  },
-  parseLocation: function(loc) {
-    // Empty strings are invalid
-    if(loc === '') {
-      return NaN;
-    }
-    // Attempt to convert the string
-    var value = Number(loc);
-    // If conversion was successful we are done
-    if(!isNaN(value)) {
-      return value;
-    }
-    // Remove the hemisphere key
-    var hemi = loc.slice(-1);
-    if(hemi === 'N' || hemi === 'E') {
-      hemi = 1;
-    } else if(hemi === 'S' || hemi === 'W') {
-      hemi = -1;
-    } else {
-      return NaN;
-    }
-    // Attempt to determine the delimiter
-    var delim = ' ';
-    if(loc.indexOf('-') > 0) {
-      delim = '-';
-    }
-    // Split the string into fields
-    var tokens = loc.slice(0, -1).split(delim);
-    // Convert the degree field
-    value = Number(tokens[0]);
-    // Convert the minutes field
-    var minutes = Number(tokens[1]);
-    if(isNaN(minutes)) {
-      return NaN;
-    }
-    value += minutes / 60.0;
-    //Convert the seconds field
-    if(tokens[2]) {
-      var seconds = Number(tokens[2]);
-      if(isNaN(seconds)) {
-        return NaN;
-      }
-      value += seconds / 3600.0;
-    }
-    // Apply the hemisphere sign
-    value *= hemi;
-
-    return value;
   },
   setLocation: function(loc) {
     var latitude = loc[1];
