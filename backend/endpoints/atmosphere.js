@@ -1,6 +1,8 @@
+var monk = require('monk');
+
 exports = module.exports = function(app) {
 
-  var atmosphere = app.monk('localhost/atmosphere');
+  var atmosphere = monk('localhost/atmosphere');
 
   // Get many forecastPeriod records
   app.get('api/forecastPeriods', function(req, res, next) {
@@ -75,7 +77,7 @@ exports = module.exports = function(app) {
         }
         return;
       } else {
-        var result = celery.call(
+        var result = app.celery.call(
           'tasks.atmosphere.extract_sounding.extract_block',
           [time, lat, lon, 3]
         );
@@ -151,7 +153,7 @@ exports = module.exports = function(app) {
         res.send({sounding:docs});
         next();
       } else {
-        var result = celery.call(
+        var result = app.celery.call(
           'atmosphereTasks.extract_forecast',
           [time, lat, lon]
         );

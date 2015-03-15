@@ -1,12 +1,7 @@
 var restify = require('restify');
 var socketio = require('socket.io');
-var monk = require('monk');
 var request = require('request');
-var celery = require('node-celery').createClient({
-	CELERY_BROKER_URL: 'amqp://guest:guest@localhost:5672',
-	CELERY_RESULT_BACKEND: 'amqp',
-	CELERY_TASK_RESULT_EXPIRES: 3600
-});
+var celery = require('node-celery');
 
 var airspace = require('./endpoints/airspace');
 var atmosphere = require('./endpoints/atmosphere');
@@ -19,8 +14,11 @@ var googleClientId = process.env.GOOGLE_CLIENT_ID;
 var server = restify.createServer();
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
-
-server.monk = monk;
+server.celery = celery.createClient({
+	CELERY_BROKER_URL: 'amqp://guest:guest@localhost:5672',
+	CELERY_RESULT_BACKEND: 'amqp',
+	CELERY_TASK_RESULT_EXPIRES: 3600
+});;
 
 var io = socketio.listen(server);
 

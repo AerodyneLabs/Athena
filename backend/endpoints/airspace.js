@@ -1,6 +1,8 @@
+var monk = require('monk');
+
 exports = module.exports = function(app) {
 
-  var airspace = app.monk('localhost/airspace');
+  var airspace = monk('localhost/airspace');
 
   // Get many center records
   app.get('api/centers', function(req, res, next) {

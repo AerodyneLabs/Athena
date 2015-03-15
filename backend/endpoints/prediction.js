@@ -1,8 +1,8 @@
-
+var monk = require('monk');
 
 exports = module.exports = function(app) {
 
-  var flights = app.monk('localhost/flights');
+  var flights = monk('localhost/flights');
 
   // Get many prediction records
   app.get('api/predictions', function(req, res, next) {
@@ -30,7 +30,7 @@ exports = module.exports = function(app) {
   app.post('api/predictions', function(req, res, next) {
     var store = flights.get('predictions');
     var params = req.params.prediction;
-    var result = celery.call(
+    var result = app.celery.call(
       'tasks.predictor.latex1v0.run_prediction',
       [params]
     );
