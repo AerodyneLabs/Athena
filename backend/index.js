@@ -8,7 +8,7 @@ var celery = require('node-celery').createClient({
 	CELERY_TASK_RESULT_EXPIRES: 3600
 });
 
-var airspace = require('endpoints/airspace');
+var airspace = require('./endpoints/airspace');
 
 // Get environment variables
 var googleClientId = process.env.GOOGLE_CLIENT_ID;
