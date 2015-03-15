@@ -22,6 +22,6 @@ test('inverts from decimal minutes', function(assert) {
 });
 
 test('inverts from degrees-minutes-seconds', function() {
-  closeEnough(convertCoordinate('40-26.767N', null, null, true), 40.4461);
-  closeEnough(convertCoordinate('79-58.933W', null, null, true), -79.9822);
+  closeEnough(convertCoordinate('40-26-46N', null, null, true), 40.4461);
+  closeEnough(convertCoordinate('79-58-56W', null, null, true), -79.9822);
 });
