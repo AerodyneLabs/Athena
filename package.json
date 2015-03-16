@@ -57,7 +57,6 @@
     "monk": "^0.9.1",
     "node-celery": "^0.2.2",
     "request": "^2.53.0",
-    "restify": "^2.8.4",
-    "socket.io": "^1.2.1"
+    "restify": "^2.8.4"
   }
 }
