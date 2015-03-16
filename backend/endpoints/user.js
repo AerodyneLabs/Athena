@@ -5,7 +5,7 @@ exports = module.exports = function(app) {
   var googleClientId = process.env.GOOGLE_CLIENT_ID;
 
   // Validate an access token
-  server.get('api/validate', function(req, res, next) {
+  app.get('api/validate', function(req, res, next) {
     request.get({
       uri: 'https://www.googleapis.com/oauth2/v1/tokeninfo',
       qs: {
