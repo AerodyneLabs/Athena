@@ -10,7 +10,7 @@ RecordField = namedtuple('RecordField', ['start', 'length', 'just'])
 def get_field(record, field):
     """Return the contents of a field from the record as a string."""
     # Extract field based on start position and length
-    value = record[field.start-1:field.start+field.length-1]
+    value = record[field.start-1:field.start+field.length-1].decode('utf-8')
     # Strip white space based on justification
     if field.just == 'l':
         return value.rstrip()
