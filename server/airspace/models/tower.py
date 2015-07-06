@@ -3,11 +3,34 @@ from localflavor.us.us_states import STATE_CHOICES
 
 class Tower(models.Model):
 
+    # Constants
+    ATCT = 'ATCT'
+    NON_ATCT = 'NON-ATCT'
+    ATCT_AC = 'ATCT-A/C'
+    ATCT_RAPCON = 'ATCT-RAPCON'
+    ATCT_RATCF = 'ATCT-RATCF'
+    ATCT_TRACON = 'ATCT-TRACON'
+    TRACON = 'TRACON'
+    ATCT_TRACAB = 'ATCT-TRACAB'
+    ATCT_CERAP = 'ATCT-CERAP'
+    STATION_TYPE_CHOICES = (
+        (ATCT, 'ATCT'),
+        (NON_ATCT, 'NON-ATCT'),
+        (ATCT_AC, 'ATCT-A/C'),
+        (ATCT_RAPCON, 'ATCT-RAPCON'),
+        (ATCT_RATCF, 'ATCT-RATCF'),
+        (ATCT_TRACON, 'ATCT-TRACON'),
+        (TRACON, 'TRACON'),
+        (ATCT_TRACAB, 'ATCT-TRACAB'),
+        (ATCT_CERAP, 'ATCT-CERAP'),
+    )
+
     objects = models.GeoManager()
 
     # Model fields
     code = models.CharField(max_length=4)
     name = models.CharField(max_length=64)
+    station_type = models.CharField(max_length=16, choices=STATION_TYPE_CHOICES, default=NON_ATCT)
     effective = models.DateField()
     center = models.ForeignKey('Center', blank=True, null=True)
     location = models.PointField()

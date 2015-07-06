@@ -14,4 +14,4 @@ class NavaidSerializer(serializers.GeoModelSerializer):
 class TowerSerializer(serializers.GeoModelSerializer):
     class Meta:
         model = models.tower.Tower
-        fields = ('id', 'code', 'name', 'location', 'center', 'city', 'state', 'master')
+        fields = ('id', 'code', 'name', 'station_type', 'location', 'center', 'city', 'state', 'master')

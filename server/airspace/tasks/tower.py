@@ -59,6 +59,7 @@ def update_towers():
                     data = {
                         'code': facility_id,
                         'name': name,
+                        'station_type': facility_type,
                         'effective': effective,
                         'center': center,
                         'location': Point(lon, lat),

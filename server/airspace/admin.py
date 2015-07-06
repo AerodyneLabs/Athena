@@ -10,6 +10,7 @@ class CenterAdmin(admin.ModelAdmin):
 admin.site.register(Center, CenterAdmin)
 
 class TowerAdmin(admin.ModelAdmin):
+    list_filter = ['station_type']
     search_fields = ['code', 'name', 'city']
 
 admin.site.register(Tower, TowerAdmin)
