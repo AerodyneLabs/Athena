@@ -9,7 +9,7 @@ class Tower(models.Model):
     code = models.CharField(max_length=4)
     name = models.CharField(max_length=64)
     effective = models.DateField()
-    center = models.ForeignKey('Center')
+    center = models.ForeignKey('Center', blank=True, null=True)
     location = models.PointField()
     city = models.CharField(max_length=64)
     state = models.CharField(blank=True, max_length=2, choices=STATE_CHOICES)
