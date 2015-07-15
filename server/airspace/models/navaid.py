@@ -32,7 +32,7 @@ class Navaid(models.Model):
     code = models.CharField(max_length=4)
     name = models.CharField(max_length=64)
     effective = models.DateField()
-    location = models.PointField()
+    location = models.PointField(dim=3)
     city = models.CharField(max_length=64)
     state = models.CharField(blank=True, max_length=2, choices=STATE_CHOICES)
     variation = models.FloatField()
