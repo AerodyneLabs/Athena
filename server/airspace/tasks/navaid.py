@@ -1,7 +1,7 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from airspace.tasks import helpers
-from airspace.models.navaid import Navaid
+from airspace.models import Navaid
 from zipfile import ZipFile
 from django.contrib.gis.geos import Point
 from os import remove
@@ -62,7 +62,7 @@ def update_navaids():
                         service_volume = facility_class[0]
 
                         location = Point(lon, lat, elevation)
-                        
+
                         result = Navaid.objects.update_or_create(code=code, defaults={
                             'code': code,
                             'name': name,

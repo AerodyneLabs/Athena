@@ -1,7 +1,7 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from airspace.tasks import helpers
-from airspace.models.center import Center
+from airspace.models import Center
 from zipfile import ZipFile
 from django.contrib.gis.geos import Point, Polygon, MultiPolygon
 from os import remove
