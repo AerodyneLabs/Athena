@@ -6,7 +6,7 @@ python:
 install:
   - "pip install -r server/requirements.txt"
 before_script:
-  - psql -U postgres -c "CREATE DATABASE athena;""
+  - psql -U postgres -c "CREATE DATABASE athena;"
   - psql -U postgres -c "CREATE EXTENSION postgis" -d athena
   - psql -U postgres -c "CREATE USER athena WITH PASSWORD 'pass';"
   - psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE athena TO athena;"
