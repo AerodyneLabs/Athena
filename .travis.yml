@@ -1,20 +1,14 @@
----
-language: node_js
-
-sudo: false
-
-cache:
-  directories:
-    - node_modules
-
-before_install:
-  - "npm config set spin false"
-  - "npm install -g npm@^2"
-
+language: python
+addons:
+  postgresql: "9.3"
+python:
+  - "3.4"
 install:
-  - npm install -g bower
-  - npm install
-  - bower install
-
+  - "pip install -r requirements.txt"
+before_script:
+  - psql -U postgres -c "CREATE DATABASE athena;"
+  - psql -U postgres -c "CREATE EXTENSION postgis" -d athena
+  - psql -U postgres -c "CREATE USER athena WITH SUPERUSER PASSWORD 'pass';"
+  - psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE athena TO athena;"
 script:
-  - npm test
+  - "python manage.py test"
