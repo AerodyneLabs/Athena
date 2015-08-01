@@ -22,6 +22,7 @@ INSTALLED_APPS = (
     'django_nose',
     # Local apps
     'airspace',
+    'atmosphere',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -105,3 +106,8 @@ REST_FRAMEWORK = {
 }
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--exe',
+    '--with-progressive',
+    '--logging-clear-handlers'
+]
