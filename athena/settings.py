@@ -109,5 +109,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--exe',
     '--with-progressive',
-    '--logging-clear-handlers'
+    '--logging-clear-handlers',
+    '--with-coverage',
+    '--cover-package=airspace,atmosphere',
 ]

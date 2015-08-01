@@ -4,7 +4,8 @@ addons:
 python:
   - "3.4"
 install:
-  - "pip install -r requirements.txt"
+  - pip install -r requirements.txt
+  - pip install coveralls
 before_script:
   - psql -U postgres -c "CREATE DATABASE athena;"
   - psql -U postgres -c "CREATE EXTENSION postgis" -d athena
