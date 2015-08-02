@@ -1,7 +1,10 @@
+from collections import namedtuple
 from datetime import datetime, timedelta
+from unittest.mock import patch
 from django.test import TestCase
 import nose.tools
 import pytz
+import requests
 
 import atmosphere.tasks.nomads as nomads
 
@@ -67,3 +70,33 @@ class NOMADSTestCase(TestCase):
         ft = datetime(2015, 7, 31, 9, tzinfo=pytz.utc)
         url = nomads.gfs_url(model_run=mt, forecast_time=ft, resolution=nomads.GFS_0_25_DEGREE)
         nose.tools.assert_equal(url, 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.2015073106/gfs.t06z.pgrb2.0p25.f003')
+
+    def test_get_index_fail(self):
+        mt = datetime(2015, 7, 31, 6, tzinfo=pytz.utc)
+        ft = datetime(2015, 7, 31, 9, tzinfo=pytz.utc)
+        url = nomads.gfs_url(model_run=mt, forecast_time=ft) + '.fail'
+        nose.tools.assert_raises(RuntimeError, nomads._get_index, url)
+
+    @patch('requests.get')
+    def test_get_index(self, mock):
+        # Create mock requests.get
+        RequestResponse = namedtuple('RequestResponse', ['status_code', 'text'])
+        response = RequestResponse(200,
+            """1:0:d=2015073106:UGRD:planetary boundary layer:anl:
+            2:53284:d=2015073106:VGRD:planetary boundary layer:anl:
+            3:107282:d=2015073106:VRATE:planetary boundary layer:anl:
+            4:136873:d=2015073106:GUST:surface:anl:
+            5:190581:d=2015073106:HGT:10 mb:anl:
+            6:234919:d=2015073106:TMP:10 mb:anl:
+            7:256587:d=2015073106:RH:10 mb:anl:
+            8:266290:d=2015073106:UGRD:10 mb:anl:
+            9:291237:d=2015073106:VGRD:10 mb:anl:
+            10:313147:d=2015073106:ABSV:10 mb:anl:
+            11:353237:d=2015073106:O3MR:10 mb:anl:""")
+        mock.return_value = response
+        url = 'http://mock'
+
+        index = nomads._get_index(url)
+
+        mock.assert_called_with(url + '.idx')
+        nose.tools.assert_equal(index[4], nomads.IndexRecord(5, 190581, 'd=2015073106', 'HGT', '10 mb', 'anl', ''))

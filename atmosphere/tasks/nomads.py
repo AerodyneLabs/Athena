@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
+from collections import namedtuple
 import pytz
+import requests
 
 GFS_1_0_DEGREE = 0
 GFS_0_5_DEGREE = 1
@@ -81,3 +83,32 @@ def previous_forecast(model, forecast):
         h = GFS_FORECAST_MAX
     # Return forecast timestep time
     return model + timedelta(hours=h)
+
+IndexRecord = namedtuple('IndexRecord', [
+    'id',
+    'start_byte',
+    'model_run',
+    'name',
+    'level',
+    'forecast',
+    'reserved'
+])
+
+def _get_index(forecast_url):
+    # Download index file
+    index_url = forecast_url + '.idx'
+    r = requests.get(index_url)
+
+    if r.status_code != requests.codes.ok:
+        raise RuntimeError('Downloading %s failed with error %s!', index_url, r.status_code)
+
+    # Parse index
+    index = []
+    for line in iter(r.text.splitlines()):
+        tokens = line.split(':')
+        tokens[0] = int(tokens[0])
+        tokens[1] = int(tokens[1])
+        record = IndexRecord(*tokens)
+        index.append(record)
+
+    return index
