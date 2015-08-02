@@ -20,6 +20,11 @@ class NOMADSTestCase(TestCase):
         ft = datetime(2015, 7, 31, 10)
         nose.tools.assert_equal(nomads.previous_forecast(mt, ft), datetime(2015, 7, 31, 9))
 
+    def test_previous_forecast_max(self):
+        mt = datetime(2015, 7, 31, 6)
+        ft = datetime(2015, 8, 11, 10)
+        nose.tools.assert_equal(nomads.previous_forecast(mt, ft), datetime(2015, 8, 10, 6))
+
     def test_gfs_url_naive_model(self):
         mt = datetime(2015, 7, 31, 6)
         ft = datetime(2015, 7, 31, 9)
