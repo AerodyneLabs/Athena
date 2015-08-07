@@ -112,3 +112,6 @@ def _get_index(forecast_url):
         index.append(record)
 
     return index
+
+def _filter_index(index, names, levels):
+    return list(filter(lambda x: True if x.name in names and x.level in levels else False, index))

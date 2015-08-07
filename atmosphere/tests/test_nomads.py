@@ -100,3 +100,19 @@ class NOMADSTestCase(TestCase):
 
         mock.assert_called_with(url + '.idx')
         nose.tools.assert_equal(index[4], nomads.IndexRecord(5, 190581, 'd=2015073106', 'HGT', '10 mb', 'anl', ''))
+
+    def test_filter_index(self):
+        index = [
+            nomads.IndexRecord(1, 0, 'd=2015073106', 'UGRD', 'planetary boundary layer', 'anl', ''),
+            nomads.IndexRecord(2, 53284, 'd=2015073106', 'VGRD', 'planetary boundary layer', 'anl', ''),
+            nomads.IndexRecord(8, 266290, 'd=2015073106', 'UGRD', '10 mb', 'anl', ''),
+            nomads.IndexRecord(9, 291237, 'd=2015073106', 'VGRD', '10 mb', 'anl', ''),
+        ]
+
+        nose.tools.assert_equal(
+            nomads._filter_index(index, ['VGRD'], ['planetary boundary layer', '10 mb']),
+            [
+                nomads.IndexRecord(2, 53284, 'd=2015073106', 'VGRD', 'planetary boundary layer', 'anl', ''),
+                nomads.IndexRecord(9, 291237, 'd=2015073106', 'VGRD', '10 mb', 'anl', ''),
+            ]
+        )
