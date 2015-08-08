@@ -1,5 +1,5 @@
-from collections import namedtuple
 from datetime import datetime, timedelta
+from types import SimpleNamespace
 from unittest.mock import patch
 from django.test import TestCase
 import nose.tools
@@ -75,20 +75,34 @@ class GfsUrl(TestCase):
         url = nomads.gfs_url(model_run=mt, forecast_time=ft, resolution=nomads.GFS_0_25_DEGREE)
         nose.tools.assert_equal(url, 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.2015073106/gfs.t06z.pgrb2.0p25.f003')
 
-class GetIndex(TestCase):
+class Index(TestCase):
 
-    def test_fail(self):
+    def setUp(self):
+        self.index = [
+            SimpleNamespace(name='UGRD', level='planetary boundary layer', start_byte=0, stop_byte=53283),
+            SimpleNamespace(name='VGRD', level='planetary boundary layer', start_byte=53284, stop_byte=107281),
+            SimpleNamespace(name='VRATE', level='planetary boundary layer', start_byte=107282, stop_byte=136872),
+            SimpleNamespace(name='GUST', level='surface', start_byte=136873, stop_byte=190580),
+            SimpleNamespace(name='HGT', level='10 mb', start_byte=190581, stop_byte=234918),
+            SimpleNamespace(name='TMP', level='10 mb', start_byte=234919, stop_byte=256586),
+            SimpleNamespace(name='RH', level='10 mb', start_byte=256587, stop_byte=266289),
+            SimpleNamespace(name='UGRD', level='10 mb', start_byte=266290, stop_byte=291236),
+            SimpleNamespace(name='VGRD', level='10 mb', start_byte=291237, stop_byte=313146),
+            SimpleNamespace(name='ABSV', level='10 mb', start_byte=313147, stop_byte=353236),
+            SimpleNamespace(name='O3MR', level='10 mb', start_byte=353237, stop_byte=None),
+        ]
+
+    def test_bad_index(self):
         mt = datetime(2015, 7, 31, 6, tzinfo=pytz.utc)
         ft = datetime(2015, 7, 31, 9, tzinfo=pytz.utc)
         url = nomads.gfs_url(model_run=mt, forecast_time=ft) + '.fail'
         nose.tools.assert_raises(RuntimeError, nomads._get_index, url)
 
     @patch('requests.get')
-    def test(self, mock):
+    def test_get_index(self, mock):
         # Create mock requests.get
-        RequestResponse = namedtuple('RequestResponse', ['status_code', 'text'])
-        response = RequestResponse(200,
-            """1:0:d=2015073106:UGRD:planetary boundary layer:anl:
+        response = SimpleNamespace(status_code=200,
+            text="""1:0:d=2015073106:UGRD:planetary boundary layer:anl:
             2:53284:d=2015073106:VGRD:planetary boundary layer:anl:
             3:107282:d=2015073106:VRATE:planetary boundary layer:anl:
             4:136873:d=2015073106:GUST:surface:anl:
@@ -105,32 +119,25 @@ class GetIndex(TestCase):
         index = nomads._get_index(url)
 
         mock.assert_called_with(url + '.idx')
-        nose.tools.assert_equal(index[4], nomads.IndexRecord(5, 190581, 'd=2015073106', 'HGT', '10 mb', 'anl', ''))
-
-class FilterIndex(TestCase):
-
-    def setUp(self):
-        self.index = [
-            nomads.IndexRecord(1, 0, 'd=2015073106', 'UGRD', 'planetary boundary layer', 'anl', ''),
-            nomads.IndexRecord(2, 53284, 'd=2015073106', 'VGRD', 'planetary boundary layer', 'anl', ''),
-            nomads.IndexRecord(8, 266290, 'd=2015073106', 'UGRD', '10 mb', 'anl', ''),
-            nomads.IndexRecord(9, 291237, 'd=2015073106', 'VGRD', '10 mb', 'anl', ''),
-        ]
+        nose.tools.assert_equal(index, self.index)
 
     def test(self):
         nose.tools.assert_equal(
             nomads._filter_index(self.index, ['VGRD'], ['planetary boundary layer', '10 mb']),
-            [self.index[1], self.index[3]]
+            [self.index[1], self.index[8]]
         )
 
     def test_no_names(self):
         nose.tools.assert_equal(
-            nomads._filter_index(index=self.index, levels=['planetary boundary layer']),
-            [self.index[0], self.index[1]]
+            nomads._filter_index(self.index, levels=['planetary boundary layer']),
+            [self.index[0], self.index[1], self.index[2]]
         )
 
     def test_no_levels(self):
         nose.tools.assert_equal(
             nomads._filter_index(self.index, names=['UGRD']),
-            [self.index[0], self.index[2]]
+            [self.index[0], self.index[7]]
         )
+
+    def test_build_range_header(self):
+        assert False

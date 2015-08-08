@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from collections import namedtuple
+from types import SimpleNamespace
 import pytz
 import requests
 
@@ -84,16 +84,6 @@ def previous_forecast(model_run, forecast_time):
     # Return forecast timestep time
     return model_run + timedelta(hours=h)
 
-IndexRecord = namedtuple('IndexRecord', [
-    'id',
-    'start_byte',
-    'model_run',
-    'name',
-    'level',
-    'forecast',
-    'reserved'
-])
-
 def _get_index(forecast_url):
     # Download index file
     index_url = forecast_url + '.idx'
@@ -106,16 +96,22 @@ def _get_index(forecast_url):
     index = []
     for line in iter(r.text.splitlines()):
         tokens = line.split(':')
-        tokens[0] = int(tokens[0])
-        tokens[1] = int(tokens[1])
-        record = IndexRecord(*tokens)
-        index.append(record)
+        index.append(
+            SimpleNamespace(name=tokens[3], level=tokens[4], start_byte=int(tokens[1]))
+        )
+
+    # Set stop bytes
+    for i in range(len(index) - 1):
+        cur_record = index[i]
+        next_record = index[i + 1]
+        cur_record.stop_byte = next_record.start_byte - 1
+    index[-1].stop_byte = None
 
     return index
 
 def _filter_index(index, names=None, levels=None):
     filtered = []
-    
+
     for record in index:
         if names is None or record.name in names:
             if levels is None or record.level in levels:
@@ -123,5 +119,13 @@ def _filter_index(index, names=None, levels=None):
 
     return filtered
 
+def _build_range_header(index):
+    pass
+
 def download_gfs_model(model_run=datetime.now(tz=pytz.utc), forecast_time=datetime.now(tz=pytz.utc), resolution=GFS_1_0_DEGREE, variables=None, levels=None):
-    model_url = gfs_url(model_run=model_run, forecast_time=forecast_time, resolution=resolution)
+    # Get url
+    forecast_url = gfs_url(model_run=model_run, forecast_time=forecast_time, resolution=resolution)
+    # Get index
+    index = _get_index(forecast_url)
+    # Filter index
+    index = _filter_index(index, names, levels)
