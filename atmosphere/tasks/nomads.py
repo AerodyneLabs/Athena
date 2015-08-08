@@ -60,29 +60,29 @@ def gfs_url(model_run=datetime.now(tz=pytz.utc), forecast_time=datetime.now(tz=p
     # Return full url
     return base_url + model_folder + forecast_filename
 
-def previous_model(model, conservative=False):
+def previous_model(model_run, conservative=False):
     discard = timedelta(
-        hours=model.hour % GFS_MODEL_TIMESTEP,
-        minutes=model.minute,
-        seconds=model.second,
-        microseconds=model.microsecond
+        hours=model_run.hour % GFS_MODEL_TIMESTEP,
+        minutes=model_run.minute,
+        seconds=model_run.second,
+        microseconds=model_run.microsecond
     )
 
     if conservative:
         discard += timedelta(hours=6)
 
-    return model - discard
+    return model_run - discard
 
-def previous_forecast(model, forecast):
+def previous_forecast(model_run, forecast_time):
     # Compute number of hours between model and forecast
-    dt = (forecast - model).total_seconds() / 3600
+    dt = (forecast_time - model_run).total_seconds() / 3600
     # Get forecast timestep before requested forecast time
     h = (dt // GFS_FORECAST_TIMESTEP) * GFS_FORECAST_TIMESTEP
     # Limit forecast time to maximum timestep
     if h > GFS_FORECAST_MAX:
         h = GFS_FORECAST_MAX
     # Return forecast timestep time
-    return model + timedelta(hours=h)
+    return model_run + timedelta(hours=h)
 
 IndexRecord = namedtuple('IndexRecord', [
     'id',
@@ -113,5 +113,15 @@ def _get_index(forecast_url):
 
     return index
 
-def _filter_index(index, names, levels):
-    return list(filter(lambda x: True if x.name in names and x.level in levels else False, index))
+def _filter_index(index, names=None, levels=None):
+    filtered = []
+    
+    for record in index:
+        if names is None or record.name in names:
+            if levels is None or record.level in levels:
+                filtered.append(record)
+
+    return filtered
+
+def download_gfs_model(model_run=datetime.now(tz=pytz.utc), forecast_time=datetime.now(tz=pytz.utc), resolution=GFS_1_0_DEGREE, variables=None, levels=None):
+    model_url = gfs_url(model_run=model_run, forecast_time=forecast_time, resolution=resolution)
