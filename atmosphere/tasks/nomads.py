@@ -130,12 +130,21 @@ def _build_range_header(index):
 
     return 'bytes=' + ','.join(chunks)
 
-def download_gfs_model(model_run=datetime.now(tz=pytz.utc), forecast_time=datetime.now(tz=pytz.utc), resolution=GFS_1_0_DEGREE, variables=None, levels=None):
+def download_gfs_model(model_run=datetime.now(tz=pytz.utc), forecast_time=datetime.now(tz=pytz.utc), resolution=GFS_1_0_DEGREE, names=None, levels=None):
     # Get url
     forecast_url = gfs_url(model_run=model_run, forecast_time=forecast_time, resolution=resolution)
+    # Extract filename
+    filename = 'data/' + forecast_url.split('/')[-1]
     # Get index
     index = _get_index(forecast_url)
     # Filter index
     index = _filter_index(index, names, levels)
     # Get range header
     range_header = _build_range_header(index)
+    # Download forecast file
+    r = requests.get(forecast_url, headers={'Range': range_header}, stream=True)
+    with open(filename, 'wb') as f:
+        for chunk in r.iter_content(1024):
+            f.write(chunk)
+
+    return filename

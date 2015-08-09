@@ -135,3 +135,9 @@ class Index(TestCase):
             nomads._build_range_header([self.index[0], self.index[10]]),
             'bytes=0-53283,353237-'
         )
+
+class GFS(TestCase):
+
+    @patch(requests.get)
+    def test_download(self):
+        assert False
