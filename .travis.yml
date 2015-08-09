@@ -4,7 +4,7 @@ addons:
   postgresql: "9.3"
   apt:
     packages:
-    - libopenjpg-dev
+    - libopenjpeg-dev
     - libpng-dev
     - libgrib-api-dev
 python:
