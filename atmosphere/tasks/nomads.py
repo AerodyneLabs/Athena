@@ -120,7 +120,15 @@ def _filter_index(index, names=None, levels=None):
     return filtered
 
 def _build_range_header(index):
-    pass
+    chunks = []
+
+    for record in index:
+        if record.stop_byte:
+            chunks.append('%s-%s' % (record.start_byte, record.stop_byte))
+        else:
+            chunks.append('%s-' % record.start_byte)
+
+    return 'bytes=' + ','.join(chunks)
 
 def download_gfs_model(model_run=datetime.now(tz=pytz.utc), forecast_time=datetime.now(tz=pytz.utc), resolution=GFS_1_0_DEGREE, variables=None, levels=None):
     # Get url
@@ -129,3 +137,5 @@ def download_gfs_model(model_run=datetime.now(tz=pytz.utc), forecast_time=dateti
     index = _get_index(forecast_url)
     # Filter index
     index = _filter_index(index, names, levels)
+    # Get range header
+    range_header = _build_range_header(index)

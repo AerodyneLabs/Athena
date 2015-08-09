@@ -140,4 +140,7 @@ class Index(TestCase):
         )
 
     def test_build_range_header(self):
-        assert False
+        nose.tools.assert_equal(
+            nomads._build_range_header([self.index[0], self.index[10]]),
+            'bytes=0-53283,353237-'
+        )
