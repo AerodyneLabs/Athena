@@ -10,4 +10,4 @@ class ModelRun(models.Model):
     source = models.CharField(max_length=32)
 
     def __str__(self):
-        return "%s (%s - %s deg)" % (self.effective, self.temporal_resolution, self.spatial_resolution)
+        return "%s-%s (%s / %s deg)" % (self.source, self.effective, self.temporal_resolution, self.spatial_resolution)

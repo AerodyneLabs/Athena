@@ -1,3 +1,14 @@
 from django.contrib import admin
+from atmosphere import models
 
-# Register your models here.
+class ModelRunAdmin(admin.ModelAdmin):
+    list_filter = ['spatial_resolution', 'temporal_resolution', 'source']
+    search_fields = ['effective', 'source']
+
+admin.site.register(models.ModelRun, ModelRunAdmin)
+
+class ForecastAdmin(admin.ModelAdmin):
+    list_filter = ['model_run']
+    search_fields = ['forecast_time']
+
+admin.site.register(models.Forecast, ForecastAdmin)
