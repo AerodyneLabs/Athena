@@ -8,49 +8,46 @@ import requests
 
 import atmosphere.tasks.nomads as nomads
 
-class PreviousModel(TestCase):
+class Previous(TestCase):
 
-    def test(self):
-        t = datetime(2015, 7, 31, 5)
-        nose.tools.assert_equal(nomads.previous_model(t), datetime(2015, 7, 31, 0))
+    def setUp(self):
+        self.model = datetime(2015, 7, 31, 5, tzinfo=pytz.utc)
+        self.real_model = datetime(2015, 7, 31, 6, tzinfo=pytz.utc)
 
-    def test_conservative(self):
-        t = datetime(2015, 7, 31, 5)
-        nose.tools.assert_equal(nomads.previous_model(t, conservative=True), datetime(2015, 7, 30, 18))
+    def test_previous_model(self):
+        nose.tools.assert_equal(nomads.previous_model(self.model), datetime(2015, 7, 31, 0, tzinfo=pytz.utc))
 
-class PreviousForecast(TestCase):
+    def test_previous_model_conservative(self):
+        nose.tools.assert_equal(nomads.previous_model(self.model, conservative=True), datetime(2015, 7, 30, 18, tzinfo=pytz.utc))
 
-    def test(self):
-        mt = datetime(2015, 7, 31, 6)
-        ft = datetime(2015, 7, 31, 10)
-        nose.tools.assert_equal(nomads.previous_forecast(mt, ft), datetime(2015, 7, 31, 9))
+    def test_previous_forecast(self):
+        ft = datetime(2015, 7, 31, 10, tzinfo=pytz.utc)
+        nose.tools.assert_equal(nomads.previous_forecast(self.real_model, ft), datetime(2015, 7, 31, 9, tzinfo=pytz.utc))
 
-    def test_max(self):
-        mt = datetime(2015, 7, 31, 6)
-        ft = datetime(2015, 8, 11, 10)
-        nose.tools.assert_equal(nomads.previous_forecast(mt, ft), datetime(2015, 8, 10, 6))
+    def test_previous_forecast_max(self):
+        ft = datetime(2015, 8, 11, 10, tzinfo=pytz.utc)
+        nose.tools.assert_equal(nomads.previous_forecast(self.real_model, ft), datetime(2015, 8, 10, 6, tzinfo=pytz.utc))
 
 class GfsUrl(TestCase):
 
+    def setUp(self):
+        self.naive_model = datetime(2015, 7, 31, 6)
+        self.naive_forecast = datetime(2015, 7, 31, 9)
+        self.model = datetime(2015, 7, 31, 6, tzinfo=pytz.utc)
+        self.forecast = datetime(2015, 7, 31, 9, tzinfo=pytz.utc)
+        self.early_forecast = datetime(2015, 7, 31, 5, tzinfo=pytz.utc)
+
     def test_naive_model(self):
-        mt = datetime(2015, 7, 31, 6)
-        ft = datetime(2015, 7, 31, 9)
-        nose.tools.assert_raises(ValueError, nomads.gfs_url, mt, ft)
+        nose.tools.assert_raises(ValueError, nomads.gfs_url, self.naive_model, self.forecast)
 
     def test_naive_forecast(self):
-        mt = datetime(2015, 7, 31, 6, tzinfo=pytz.utc)
-        ft = datetime(2015, 7, 31, 9)
-        nose.tools.assert_raises(ValueError, nomads.gfs_url, mt, ft)
+        nose.tools.assert_raises(ValueError, nomads.gfs_url, self.model, self.naive_forecast)
 
     def test_early_forecast(self):
-        mt = datetime(2015, 7, 31, 6)
-        ft = datetime(2015, 7, 31, 5)
-        nose.tools.assert_raises(ValueError, nomads.gfs_url, mt, ft)
+        nose.tools.assert_raises(ValueError, nomads.gfs_url, self.model, self.early_forecast)
 
     def test_invalid_resolution(self):
-        mt = datetime(2015, 7, 31, 6)
-        ft = datetime(2015, 7, 31, 9)
-        nose.tools.assert_raises(ValueError, nomads.gfs_url, mt, ft, -1)
+        nose.tools.assert_raises(ValueError, nomads.gfs_url, self.model, self.forecast, -1)
 
     def test_future_model(self):
         mt = datetime.now(tz=pytz.utc) + timedelta(hours=6)
@@ -58,21 +55,15 @@ class GfsUrl(TestCase):
         nose.tools.assert_raises(ValueError, nomads.gfs_url, mt, ft)
 
     def test_one_degree(self):
-        mt = datetime(2015, 7, 31, 6, tzinfo=pytz.utc)
-        ft = datetime(2015, 7, 31, 9, tzinfo=pytz.utc)
-        url = nomads.gfs_url(model_run=mt, forecast_time=ft, resolution=nomads.GFS_1_0_DEGREE)
+        url = nomads.gfs_url(model_run=self.model, forecast_time=self.forecast, resolution=nomads.GFS_1_0_DEGREE)
         nose.tools.assert_equal(url, 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.2015073106/gfs.t06z.pgrb2.1p00.f003')
 
     def test_half_degree(self):
-        mt = datetime(2015, 7, 31, 6, tzinfo=pytz.utc)
-        ft = datetime(2015, 7, 31, 9, tzinfo=pytz.utc)
-        url = nomads.gfs_url(model_run=mt, forecast_time=ft, resolution=nomads.GFS_0_5_DEGREE)
+        url = nomads.gfs_url(model_run=self.model, forecast_time=self.forecast, resolution=nomads.GFS_0_5_DEGREE)
         nose.tools.assert_equal(url, 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.2015073106/gfs.t06z.pgrb2.0p50.f003')
 
     def test_quarter_degree(self):
-        mt = datetime(2015, 7, 31, 6, tzinfo=pytz.utc)
-        ft = datetime(2015, 7, 31, 9, tzinfo=pytz.utc)
-        url = nomads.gfs_url(model_run=mt, forecast_time=ft, resolution=nomads.GFS_0_25_DEGREE)
+        url = nomads.gfs_url(model_run=self.model, forecast_time=self.forecast, resolution=nomads.GFS_0_25_DEGREE)
         nose.tools.assert_equal(url, 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.2015073106/gfs.t06z.pgrb2.0p25.f003')
 
 class Index(TestCase):
