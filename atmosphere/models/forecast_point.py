@@ -7,6 +7,7 @@ class ForecastPoint(models.Model):
     location = models.PointField(dim=3)
     pressure = models.FloatField()
     temperature = models.FloatField()
+    humidity = models.FloatField()
     wind_u = models.FloatField()
     wind_v = models.FloatField()
 
