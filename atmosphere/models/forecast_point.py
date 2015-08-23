@@ -5,7 +5,6 @@ class ForecastPoint(models.Model):
     # Model fields
     forecast = models.ForeignKey('Forecast')
     location = models.PointField(dim=3)
-    altitude = models.FloatField()
     pressure = models.FloatField()
     temperature = models.FloatField()
     wind_u = models.FloatField()
