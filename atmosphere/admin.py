@@ -12,3 +12,9 @@ class ForecastAdmin(admin.ModelAdmin):
     search_fields = ['forecast_time']
 
 admin.site.register(models.Forecast, ForecastAdmin)
+
+class ForecastPointAdmin(admin.ModelAdmin):
+    list_filter = ['forecast']
+    search_fields = ['location', 'pressure']
+
+admin.site.register(models.ForecastPoint, ForecastPointAdmin)
