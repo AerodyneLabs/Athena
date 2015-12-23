@@ -62,17 +62,16 @@ WSGI_APPLICATION = 'athena.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'HOST': 'localhost',
-        'NAME': 'athena',
-        'USER': 'athena',
-        'PASSWORD': 'pass',
+        'HOST': 'postgres',
+        'NAME': 'postgres',
+        'USER': 'postgres',
     }
 }
 
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'LOCATION': 'redis://redis:6379/1',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient'
         }

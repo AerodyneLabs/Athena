@@ -1,0 +1,30 @@
+app:
+  restart: always
+  build: ./app
+  expose:
+    - "8000"
+  links:
+    - postgres:postgres
+    - redis:redis
+  volumes:
+    - ./app:/code
+
+nginx:
+  restart: always
+  build: ./nginx
+  ports:
+    - "80:80"
+  links:
+    - app:app
+
+postgres:
+  restart: always
+  image: mdillon/postgis:9.4
+  ports:
+    - "5432:5432"
+
+redis:
+  restart: always
+  image: redis:latest
+  ports:
+    - "6379:6379"
