@@ -1,17 +1,11 @@
-language: python
-addons:
-  postgresql: "9.3"
-python:
-  - "3.4"
-install:
-  - pip install -r requirements.txt
-  - pip install coveralls
-before_script:
-  - psql -U postgres -c "CREATE DATABASE athena;"
-  - psql -U postgres -c "CREATE EXTENSION postgis" -d athena
-  - psql -U postgres -c "CREATE USER athena WITH SUPERUSER PASSWORD 'pass';"
-  - psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE athena TO athena;"
+privileged: true
+
+services:
+  - docker
+
 script:
-  - "python manage.py test"
+  - docker-compose build
+  - docker-compose run app test
+
 after_success:
   coveralls
