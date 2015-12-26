@@ -1,3 +1,5 @@
+privileged: true
+
 services:
   - docker
 
