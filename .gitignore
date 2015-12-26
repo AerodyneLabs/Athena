@@ -1,7 +1,3 @@
-.vagrant
-data/*
-*.rdb
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -60,3 +56,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Data files
+app/data

@@ -8,6 +8,21 @@ app:
     - redis:redis
   volumes:
     - ./app:/code
+  environment:
+    - DJANGO_SETTINGS_MODULE=athena.settings
+  command: python /code/manage.py runserver 0.0.0.0:8000
+
+worker:
+  restart: always
+  build: ./app
+  links:
+    - postgres:postgres
+    - redis:redis
+  volumes:
+    - ./app:/code
+  environment:
+    - DJANGO_SETTINGS_MODULE=athena.settings
+  command: celery -A athena worker -l info
 
 nginx:
   restart: always
