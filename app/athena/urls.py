@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from rest_framework import routers
+import rest_framework_swagger as swagger
 
 from airspace import views as airspace_views
 
@@ -14,4 +15,5 @@ router.register(r'towers', airspace_views.TowerViewset)
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include(router.urls)),
+    url(r'^docs/', include('rest_framework_swagger.urls')),
 ]

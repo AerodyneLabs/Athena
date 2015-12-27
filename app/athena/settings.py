@@ -19,6 +19,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     # Installed apps
     'rest_framework',
+    'rest_framework_swagger',
     'django_nose',
     # Local apps
     'airspace',
