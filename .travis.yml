@@ -3,8 +3,10 @@ privileged: true
 services:
   - docker
 
-script:
+install:
   - docker-compose build
+
+script:
   - docker-compose run app python manage.py test
 
 after_success:
