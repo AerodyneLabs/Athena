@@ -19,6 +19,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     # Installed apps
     'rest_framework',
+    'rest_framework_json_api',
     'rest_framework_swagger',
     'django_nose',
     # Local apps
@@ -101,8 +102,19 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 # REST Framework settings
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 25,
+    'PAGINATE_BY': 10,
+    'PAGINATE_BY_PARAM': 'page_size',
+    'MAX_PAGINATE_BY': 100,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework_json_api.pagination.PageNumberPagination',
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework_json_api.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser'
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework_json_api.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
 }
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

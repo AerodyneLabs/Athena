@@ -11,6 +11,7 @@ django-nose==1.4.4
 django-redis==4.7.0
 djangorestframework==3.5.4
 djangorestframework-gis==0.11
+djangorestframework-jsonapi==2.1.1
 django-rest-swagger==2.1.1
 ipython==5.2.2
 kombu==4.0.2
