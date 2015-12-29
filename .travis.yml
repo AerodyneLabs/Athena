@@ -10,4 +10,4 @@ script:
   - docker-compose run app bash -c "sleep 30 && python manage.py test"
 
 after_success:
-  coveralls
+  - docker-compose run app coveralls
