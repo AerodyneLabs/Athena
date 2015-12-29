@@ -7,7 +7,7 @@ install:
   - docker-compose build
 
 script:
-  - docker-compose run app python manage.py test
+  - docker-compose run app bash -c "sleep 5 && python manage.py test"
 
 after_success:
   coveralls
