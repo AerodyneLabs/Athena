@@ -1,3 +1,15 @@
+postgres:
+  restart: always
+  image: mdillon/postgis:9.4
+  ports:
+    - "5432"
+
+redis:
+  restart: always
+  image: redis:latest
+  ports:
+    - "6379"
+
 app:
   restart: always
   build: ./app
@@ -31,15 +43,3 @@ nginx:
     - "80:80"
   links:
     - app:app
-
-postgres:
-  restart: always
-  image: mdillon/postgis:9.4
-  ports:
-    - "5432"
-
-redis:
-  restart: always
-  image: redis:latest
-  ports:
-    - "6379"
