@@ -6,6 +6,7 @@ celery==4.0.2
 coverage==4.3.4
 coveralls
 Django==1.10.5
+django-cors-header==2.0.2
 django-localflavor==1.4.1
 django-nose==1.4.4
 django-redis==4.7.0
