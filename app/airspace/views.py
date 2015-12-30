@@ -13,14 +13,11 @@ class AirspaceBoundaryViewset(viewsets.ReadOnlyModelViewSet):
 class CenterViewset(viewsets.ReadOnlyModelViewSet):
     queryset = models.Center.objects.all()
     serializer_class = serializers.CenterSerializer
-    lookup_field = 'code'
 
 class NavaidViewset(viewsets.ReadOnlyModelViewSet):
     queryset = models.Navaid.objects.all()
     serializer_class = serializers.NavaidSerializer
-    lookup_field = 'code'
 
 class TowerViewset(viewsets.ReadOnlyModelViewSet):
     queryset = models.Tower.objects.all()
     serializer_class = serializers.TowerSerializer
-    lookup_field = 'code'
