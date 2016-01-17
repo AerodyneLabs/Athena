@@ -6,9 +6,9 @@ class AirspaceViewset(viewsets.ReadOnlyModelViewSet):
     queryset = models.Airspace.objects.all()
     serializer_class = serializers.AirspaceSerializer
 
-class AirspaceBoundaryViewset(viewsets.ReadOnlyModelViewSet):
-    queryset = models.AirspaceBoundary.objects.all()
-    serializer_class = serializers.AirspaceBoundarySerializer
+class AirspaceVolumeViewset(viewsets.ReadOnlyModelViewSet):
+    queryset = models.AirspaceVolume.objects.all()
+    serializer_class = serializers.AirspaceVolumeSerializer
 
 class CenterViewset(viewsets.ReadOnlyModelViewSet):
     queryset = models.Center.objects.all()

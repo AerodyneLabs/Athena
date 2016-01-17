@@ -1,7 +1,8 @@
 from django.contrib.gis.db import models
 from localflavor.us.us_states import STATE_CHOICES
+from airspace.models import AirspaceBase
 
-class Navaid(models.Model):
+class Navaid(AirspaceBase):
 
     # Constants
     LOW_VOLUME = 'L'
@@ -29,9 +30,6 @@ class Navaid(models.Model):
     objects = models.GeoManager()
 
     # Model fields
-    code = models.CharField(max_length=4)
-    name = models.CharField(max_length=64)
-    effective = models.DateField()
     location = models.PointField(dim=3)
     city = models.CharField(max_length=64)
     state = models.CharField(blank=True, max_length=2, choices=STATE_CHOICES)

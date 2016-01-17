@@ -1,7 +1,8 @@
 from django.contrib.gis.db import models
 from localflavor.us.us_states import STATE_CHOICES
+from airspace.models import AirspaceBase
 
-class Tower(models.Model):
+class Tower(AirspaceBase):
 
     # Constants
     ATCT = 'ATCT'
@@ -28,10 +29,7 @@ class Tower(models.Model):
     objects = models.GeoManager()
 
     # Model fields
-    code = models.CharField(max_length=4)
-    name = models.CharField(max_length=64)
     station_type = models.CharField(max_length=16, choices=STATION_TYPE_CHOICES, default=NON_ATCT)
-    effective = models.DateField()
     center = models.ForeignKey('Center', blank=True, null=True)
     location = models.PointField()
     city = models.CharField(max_length=64)

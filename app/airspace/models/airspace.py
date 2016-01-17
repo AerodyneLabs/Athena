@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models
+from airspace.models import AirspaceBase
 
-class Airspace(models.Model):
+class Airspace(AirspaceBase):
 
     CLASS_A = 'A'
     CLASS_B = 'B'
@@ -22,8 +23,6 @@ class Airspace(models.Model):
     objects = models.GeoManager()
 
     # Model fields
-    name = models.CharField(max_length=64, unique=True)
-    effective = models.DateField()
     classification = models.CharField(max_length=1, choices=CLASSIFICATION_CHOICES)
 
     def __str__(self):
