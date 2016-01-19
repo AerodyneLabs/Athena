@@ -104,7 +104,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 # REST Framework settings
 REST_FRAMEWORK = {
-    'PAGINATE_BY': 10,
+    'PAGINATE_BY': 25,
     'PAGINATE_BY_PARAM': 'page_size',
     'MAX_PAGINATE_BY': 100,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework_json_api.pagination.PageNumberPagination',
@@ -118,6 +118,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 }
+JSON_API_FORMAT_KEYS = 'camelize'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
