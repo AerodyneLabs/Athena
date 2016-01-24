@@ -118,7 +118,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 }
-JSON_API_FORMAT_KEYS = 'camelize'
+JSON_API_FORMAT_KEYS = 'dasherize'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
