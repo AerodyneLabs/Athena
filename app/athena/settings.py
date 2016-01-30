@@ -20,6 +20,7 @@ INSTALLED_APPS = (
     # Installed apps
     'corsheaders',
     'rest_framework',
+    'rest_framework_filters',
     'rest_framework_json_api',
     'rest_framework_swagger',
     'django_nose',
@@ -116,6 +117,9 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_filters.backends.DjangoFilterBackend',
     ),
 }
 JSON_API_FORMAT_KEYS = 'dasherize'
