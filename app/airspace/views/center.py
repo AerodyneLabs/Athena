@@ -12,7 +12,7 @@ class CenterFilter(filters.FilterSet):
     bounds = filters.MethodFilter()
     search = filters.MethodFilter()
 
-    def filter_bounds(self, queryset, value):
+    def filter_bounds(self, name, queryset, value):
         try:
             # Split boundary string into southwest and northeast points
             points = [point.split(',') for point in value.split('|')]
@@ -35,7 +35,7 @@ class CenterFilter(filters.FilterSet):
 
         return queryset.filter(volumes__boundary__bboverlaps=bbox).distinct()
 
-    def filter_search(self, queryset, value):
+    def filter_search(self, name, queryset, value):
         return queryset.filter(Q(code__iexact=value) | Q(name__icontains=value)).distinct()
 
     class Meta:
