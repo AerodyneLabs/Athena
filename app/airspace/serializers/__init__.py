@@ -1,0 +1,5 @@
+from airspace.serializers.airspace_volume import AirspaceVolumeSerializer
+from airspace.serializers.airspace import AirspaceSerializer
+from airspace.serializers.center import CenterSerializer
+from airspace.serializers.navaid import NavaidSerializer
+from airspace.serializers.tower import TowerSerializer

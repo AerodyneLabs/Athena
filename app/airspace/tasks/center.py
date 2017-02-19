@@ -1,7 +1,7 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from airspace.tasks import helpers
-from airspace.models import Center
+from airspace.models import Center, AirspaceVolume
 from zipfile import ZipFile
 from django.contrib.gis.geos import Point, Polygon, MultiPolygon
 from os import remove
@@ -78,12 +78,16 @@ def update_centers():
                 rec_alt = helpers.get_field(line, ARB_FIELDS['structure'])
                 if cur_facility != facility_id or cur_alt != rec_alt:
                     if cur_facility != '':
-                        if cur_alt == 'HIGH':
-                            cur_points.append(cur_points[0])
-                            poly = Polygon(cur_points).buffer(0)
-                            if isinstance(poly, Polygon):
-                                poly = MultiPolygon(poly)
-                            data[cur_facility]['boundary'] = poly
+                        # if cur_alt == 'HIGH':
+                        cur_points.append(cur_points[0])
+                        # poly = Polygon(cur_points).buffer(0)
+                        # if isinstance(poly, Polygon):
+                            # poly = MultiPolygon(poly)
+                        # data[cur_facility]['boundary'] = poly
+                        if cur_facility in data:
+                            if 'boundary' not in data[cur_facility]:
+                                data[cur_facility]['boundary'] = {}
+                            data[cur_facility]['boundary'][cur_alt] = Polygon(cur_points)
                     cur_facility = facility_id
                     cur_alt = rec_alt
                     cur_points = []
@@ -99,7 +103,17 @@ def update_centers():
         rec = data[facility_id]
         if 'boundary' in rec:
             count += 1
+            polys = rec.pop('boundary')
             result = Center.objects.update_or_create(code=facility_id, defaults=rec)
+            for key, value in polys.items():
+                AirspaceVolume.objects.create(
+                    parent=result[0],
+                    name="%s - %s" % (rec['name'], key),
+                    high_altitude=0,
+                    low_altitude=0,
+                    effective=rec['effective'],
+                    boundary=value
+                )
             if result[1]:
                 logger.info("Created %s-%s...", facility_id, rec['name'])
             else:

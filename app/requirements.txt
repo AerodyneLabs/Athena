@@ -6,11 +6,14 @@ celery==4.0.2
 coverage==4.3.4
 coveralls
 Django==1.10.5
+django-cors-headers==2.0.2
 django-localflavor==1.4.1
 django-nose==1.4.4
 django-redis==4.7.0
 djangorestframework==3.5.4
+djangorestframework-filters==0.9.1
 djangorestframework-gis==0.11
+djangorestframework-jsonapi==2.1.1
 django-rest-swagger==2.1.1
 ipython==5.2.2
 kombu==4.0.2

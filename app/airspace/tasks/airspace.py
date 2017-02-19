@@ -5,7 +5,7 @@ from zipfile import ZipFile
 from shapefile import Reader
 from os import remove
 from django.contrib.gis.geos import Polygon, MultiPolygon
-from airspace.models import Airspace, AirspaceBoundary
+from airspace.models import Airspace, AirspaceVolume
 
 logger = get_task_logger(__name__)
 
@@ -59,13 +59,13 @@ def update_airspace():
                         logger.info("Created airspace %s", airspace)
                     else:
                         logger.info("Updated airspace %s", airspace)
-                        AirspaceBoundary.objects.filter(airspace=airspace_obj).delete()
+                        AirspaceVolume.objects.filter(parent=airspace_obj).delete()
 
                 for poly in polys:
-                    AirspaceBoundary.objects.create(
+                    AirspaceVolume.objects.create(
                         name=name,
                         effective=effective,
-                        airspace=airspace_obj,
+                        parent=airspace_obj,
                         low_altitude=low,
                         high_altitude=high,
                         boundary=poly

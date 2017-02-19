@@ -1,15 +1,12 @@
 from django.contrib.gis.db import models
 from localflavor.us.us_states import STATE_CHOICES
+from airspace.models import AirspaceBase
 
-class Center(models.Model):
+class Center(AirspaceBase):
 
     objects = models.GeoManager()
 
     # Model fields
-    code = models.CharField(max_length=4)
-    name = models.CharField(max_length=64)
-    effective = models.DateField()
-    boundary = models.MultiPolygonField()
     location = models.PointField()
     city = models.CharField(max_length=64)
     state = models.CharField(blank=True, max_length=2, choices=STATE_CHOICES)
