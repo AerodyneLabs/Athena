@@ -6,7 +6,7 @@ SECRET_KEY = '%jp)7$2q$isue_b4yr)gf$+0t^2$g8@aung$d)qj)iep)xhri@'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = (
     # Django apps
