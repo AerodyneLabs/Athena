@@ -1,23 +1,13 @@
-language: python
-sudo: false
-addons:
-  postgresql: "9.3"
-  apt:
-    packages:
-    - libopenjpeg-dev
-    - libpng-dev
-    - libgrib-api-dev
-python:
-  - "3.4"
+privileged: true
+
+services:
+  - docker
+
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls
-before_script:
-  - psql -U postgres -c "CREATE DATABASE athena;"
-  - psql -U postgres -c "CREATE EXTENSION postgis" -d athena
-  - psql -U postgres -c "CREATE USER athena WITH SUPERUSER PASSWORD 'pass';"
-  - psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE athena TO athena;"
+  - docker-compose build
+
 script:
-  - "python manage.py test"
+  - docker-compose run app bash -c "sleep 30 && python manage.py test"
+
 after_success:
-  coveralls
+  - docker-compose run app coveralls

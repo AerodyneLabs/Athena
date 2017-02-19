@@ -1,0 +1,7 @@
+languages:
+  Ruby: false
+  JavaScript: true
+  Python: true
+  PHP: false
+exclude_paths:
+- "*/migrations/*"
