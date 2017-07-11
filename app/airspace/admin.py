@@ -33,7 +33,7 @@ admin.site.register(models.Center, CenterAdmin)
 
 class TowerAdmin(admin.ModelAdmin):
     search_fields = ['code', 'name', 'city']
-    list_filter = ['station_type', 'center', 'effective']
+    list_filter = ['station_type', 'artcc', 'effective']
     list_display = ['code', 'name', 'station_type', 'center', 'city', 'state', 'effective']
 
 admin.site.register(models.Tower, TowerAdmin)

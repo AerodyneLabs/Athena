@@ -5,4 +5,4 @@ from airspace import models
 class TowerSerializer(geo_serializers.GeoModelSerializer):
     class Meta:
         model = models.Tower
-        fields = ('id', 'code', 'name', 'station_type', 'effective', 'location', 'center', 'city', 'state', 'master')
+        fields = ('id', 'code', 'name', 'station_type', 'effective', 'location', 'artcc', 'city', 'state', 'master')

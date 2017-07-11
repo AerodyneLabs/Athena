@@ -30,7 +30,7 @@ class Tower(AirspaceBase):
 
     # Model fields
     station_type = models.CharField(max_length=16, choices=STATION_TYPE_CHOICES, default=NON_ATCT)
-    center = models.ForeignKey('Center', blank=True, null=True)
+    artcc = models.ForeignKey('Center', blank=True, null=True)
     location = models.PointField()
     city = models.CharField(max_length=64)
     state = models.CharField(blank=True, max_length=2, choices=STATE_CHOICES)
